@@ -1,0 +1,50 @@
+<module>
+    <manifestVersion>1.0.0</manifestVersion>
+
+    <symbolicName>quasi-analysis</symbolicName>
+    <name>QAA-for-IOP</name>
+    <version>1.0.0</version>
+
+
+    <description>A first attempt at creating a processor.</description>
+
+    <vendor>U.S. Naval Research Center and Winona State University</vendor>
+    <contactAddress>n/a</contactAddress>
+    <copyright>(C) 2007-2009 by U.S. Naval Research Laboratory</copyright>
+    <url></url>
+    <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
+
+    <dependency>
+        <module>beam-processing</module>
+    </dependency>
+	<dependency>
+        <module>beam-envisat-reader</module>
+    </dependency>
+    <dependency>
+        <module>beam-visat</module>
+        <optional>true</optional>
+    </dependency>
+
+    <categories>Application,Processor,MERIS</categories>
+
+    <extension point="beam-visat:actions">
+        <action>
+            <id>analyisisScientificTool</id>
+            <class>org.esa.beam.visat.actions.ProcessorAction</class>
+            <processor>org.esa.beam.visat.processor.quasi.AnalyticalProcessor</processor>
+            <text>QAA for IOP</text>
+            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
+            <mnemonic>Q</mnemonic>
+            <parent>tools</parent>
+            <helpID>quasiAnalysisTool</helpID>
+            <placeAfter>createFilteredBand</placeAfter>
+        </action>
+    </extension>
+
+	<extension point="beam-ui:helpSets">
+        <helpSet>
+            <parent>beam-help</parent>
+            <path>doc/help/qaa_v5.hs</path>
+        </helpSet>
+    </extension>
+</module>
