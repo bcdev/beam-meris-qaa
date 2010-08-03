@@ -1,12 +1,11 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
 
-    <symbolicName>quasi-analysis</symbolicName>
-    <name>QAA-for-IOP</name>
-    <version>1.0.0</version>
+    <symbolicName>beam-meris-qaa</symbolicName>
+    <name>QAA IOP Processor</name>
+    <version>1.0.1</version>
 
-
-    <description>A first attempt at creating a processor.</description>
+    <description>Retrieval of inherent optical properties (IOPs) for coastal and open ocean waters for MERIS.</description>
 
     <vendor>U.S. Naval Research Center and Winona State University</vendor>
     <contactAddress>n/a</contactAddress>
@@ -44,7 +43,7 @@
 	<extension point="beam-ui:helpSets">
         <helpSet>
             <parent>beam-help</parent>
-            <path>doc/help/qaa_v5.hs</path>
+            <path>doc/help/qaa_v4.hs</path>
         </helpSet>
     </extension>
 </module>
