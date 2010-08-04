@@ -5,7 +5,8 @@
     <name>QAA IOP Processor</name>
     <version>1.0.1</version>
 
-    <description>Retrieval of inherent optical properties (IOPs) for coastal and open ocean waters for MERIS.</description>
+    <description>This BEAM module allows the retrieval of inherent optical properties (IOPs) for coastal and open
+        ocean waters for MERIS.</description>
 
     <vendor>U.S. Naval Research Center and Winona State University</vendor>
     <contactAddress>n/a</contactAddress>
