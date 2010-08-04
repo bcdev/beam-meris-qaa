@@ -5,8 +5,18 @@
     <name>QAA IOP Processor</name>
     <version>1.0.1</version>
 
-    <description>This BEAM module allows the retrieval of inherent optical properties (IOPs) for coastal and open
-        ocean waters for MERIS.</description>
+    <description>
+        <![CDATA[
+            <p>This BEAM module allows the retrieval of inherent optical properties (IOPs) for coastal and open
+            ocean waters for MERIS.</p>
+
+            <p>Documentation:</p>
+            <ul>
+                <li><a href="http://github.com/downloads/bcdev/beam-meris-qaa/Lee_2002_QAA.pdf">Processor Documentation (Journal paper)</a></li>
+                <li><a href="http://github.com/downloads/bcdev/beam-meris-qaa/QAA_v5.pdf">update to the documentation paper</a></li>
+            </ul>
+        ]]>
+    </description>
 
     <vendor>U.S. Naval Research Center and Winona State University</vendor>
     <contactAddress>n/a</contactAddress>
