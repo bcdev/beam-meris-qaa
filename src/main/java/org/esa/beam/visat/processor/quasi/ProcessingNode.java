@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.esa.beam.dataio.dimap.DimapProductConstants;
-import org.esa.beam.framework.dataio.IllegalFileFormatException;
 import org.esa.beam.framework.dataio.ProductIO;
 import org.esa.beam.framework.dataio.ProductReader;
 import org.esa.beam.framework.dataio.ProductReaderPlugIn;
@@ -62,7 +61,7 @@ public abstract class ProcessingNode implements ProductReader {
 	}
 
 	public Product readProductNodes(Object input, ProductSubsetDef subsetDef)
-			throws IOException, IllegalFileFormatException {
+			throws IOException {
 		if (subsetDef != null)
 			throw new IllegalArgumentException(
 					"ProductSubsetDefs are not supported.");
@@ -91,11 +90,6 @@ public abstract class ProcessingNode implements ProductReader {
 		return frameData;
 	}
 
-	public Rectangle getMaxFrameSize() {
-		return new Rectangle(sourceProduct.getSceneRasterWidth(), sourceProduct
-				.getSceneRasterHeight());
-	}
-
 	private Product createTargetProduct() {
 		targetProduct = createTargetProductImpl();
 		targetProduct.setProductReader(this);
@@ -112,8 +106,7 @@ public abstract class ProcessingNode implements ProductReader {
 			if (frameRect.x == targetX && frameRect.y == targetY
 					&& frameRect.width == targetW
 					&& frameRect.height == targetH) {
-				System
-						.arraycopy(sourceElems, 0, targetElems, 0,
+				System.arraycopy(sourceElems, 0, targetElems, 0,
 								targetNumElems);
 			} else {
 				final int offsetY = targetY - frameRect.y;
@@ -127,15 +120,8 @@ public abstract class ProcessingNode implements ProductReader {
 				}
 			}
 		} else {
-			// TODO - What's the meaning of this code structure?
-			for (int y = targetY; y < targetY + targetW; y++) {
-				for (int x = targetX; x < targetX + targetH; x++) {
-					// targetData.setElemDoubleAt(index,
-					// sourceData.getElemDoubleAt(i));
-					System.out.println("ERROR: not supported !!!!!");
-					throw new IOException("unsupported type conversion");
-				}
-			}
+            System.out.println("ERROR: not supported !!!!!");
+            throw new IOException("unsupported type conversion");
 		}
 	}
 
@@ -175,11 +161,10 @@ public abstract class ProcessingNode implements ProductReader {
 			Rectangle frameRect, ProgressMonitor pm) throws IOException {
 		pm.beginTask("Copying band data...", sourceBands.length);
 		try {
-			for (int bandIndex = 0; bandIndex < sourceBands.length; bandIndex++) {
-				Band sourceBand = sourceBands[bandIndex];
-				copyBandData(sourceBand, destProduct, frameRect,
-						SubProgressMonitor.create(pm, 1));
-			}
+            for (Band sourceBand : sourceBands) {
+                copyBandData(sourceBand, destProduct, frameRect,
+                             SubProgressMonitor.create(pm, 1));
+            }
 		} finally {
 			pm.done();
 		}

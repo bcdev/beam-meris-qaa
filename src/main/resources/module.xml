@@ -3,7 +3,7 @@
 
     <symbolicName>beam-meris-qaa</symbolicName>
     <name>QAA IOP Processor</name>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <description>
         <![CDATA[
@@ -18,10 +18,17 @@
         ]]>
     </description>
 
+    <changelog>
+        <![CDATA[
+        Changes in 1.0.2:<br/>
+        [QAA-1] Apply new coefficients for calculation of a560 (step 2)<br/>
+        ]]>
+    </changelog>
+
     <vendor>U.S. Naval Research Center and Winona State University</vendor>
     <contactAddress>n/a</contactAddress>
     <copyright>(C) 2007-2009 by U.S. Naval Research Laboratory</copyright>
-    <url></url>
+    <url>http://github.com/bcdev/beam-meris-qaa</url>
     <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
 
     <dependency>

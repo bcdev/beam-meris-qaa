@@ -21,11 +21,8 @@ import com.bc.ceres.core.SubProgressMonitor;
 public class AnalyticalProcessor extends Processor {
 
 	public final static String PROCESSOR_NAME = "QAA for IOP Processor";
-	private final static String PROCESSOR_VERSION = "1.0.0";
+	private final static String PROCESSOR_VERSION = "1.0.2";
 	private final static String PROCESSOR_COPYRIGHT = "Copyright (C) 2009 by NRL and WSU";
-
-	public final static String DEFAULT_OUTPUT_FORMAT = DimapProductConstants.DIMAP_FORMAT_NAME;
-	public final static String DEFULAT_OUTPUT_PRODUCT_NAME = "QUASI_ANALYTICAL";
 
 	public final static String REQUEST_TYPE = "QAA_v5";
 

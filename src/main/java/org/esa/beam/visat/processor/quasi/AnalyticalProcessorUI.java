@@ -400,11 +400,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 	 */
 	private static boolean hasParameterEmptyString(final Parameter parameter) {
 		final String valueAsText = parameter.getValueAsText();
-		if (valueAsText.trim().length() <= 0) {
-			return true;
-		} else {
-			return false;
-		}
+        return valueAsText.trim().length() <= 0;
 	}
 
 	/**
@@ -559,9 +555,9 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 			return;
 		}
 		String msg = null;
-		Product product = null;
+		Product product;
 		try {
-			product = ProductIO.readProduct(file, null);
+			product = ProductIO.readProduct(file);
 			if (product != null) {
 				final String productType = product.getProductType();
 				final boolean isValidType = StringUtils.contains(

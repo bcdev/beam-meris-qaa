@@ -43,14 +43,16 @@ public class AnalyticalPN extends ProcessingNode {
 	 * QAA constants
 	 */
 	// Coefficients QAA v5, from Zhongping Lee's QAA v5
-	public static final double[] acoefs = { -1.146, -1.366, -.469 };
+    // v 1.0.1
+    // public static final double[] acoefs = { -1.146, -1.366, -.469 };
+    // v 1.0.2
+    public static final double[] acoefs = { -1.273, -1.163, -0.295 };
+
 	public static final int[] wavel = { 412, 443, 490, 510, 560, 620 };
 
 	// aw and bbw coefficients from IOP datafile
-	public static final double[] aw = { 0.00469, 0.00721, 0.015, 0.0325,
-			0.0619, 0.2755 };
-	public static final double[] bbw = { 0.003328, 0.0023885, 0.001549,
-			0.0012992, 0.0008994, 0.0005996 };
+	public static final double[] aw = { 0.00469, 0.00721, 0.015, 0.0325, 0.0619, 0.2755 };
+	public static final double[] bbw = { 0.003328, 0.0023885, 0.001549, 0.0012992, 0.0008994, 0.0005996 };
 
 	// Hard-coded here, could be adjusted in user interface
 	private float a_lower_bound = -5.0f;
@@ -415,9 +417,7 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-					for (int i = 0; i < frameSize; i++) {
-						scanLine[i] = a[b][i];
-					}
+                    System.arraycopy(a[b], 0, scanLine, 0, frameSize);
 				}
 				for (int b = 0; b < QaaBbBands.length; b++) {
 					// Get output product data for current frame.
@@ -425,9 +425,7 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-					for (int i = 0; i < frameSize; i++) {
-						scanLine[i] = bb[b][i];
-					}
+                    System.arraycopy(bb[b], 0, scanLine, 0, frameSize);
 				}
 				for (int b = 0; b < QaaAphBands.length; b++) {
 					// Get output product data for current frame.
@@ -435,9 +433,7 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-					for (int i = 0; i < frameSize; i++) {
-						scanLine[i] = aph[b][i];
-					}
+                    System.arraycopy(aph[b], 0, scanLine, 0, frameSize);
 				}
 				for (int b = 0; b < QaaAdgBands.length; b++) {
 					// Get output product data for current frame.
@@ -445,9 +441,7 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-					for (int i = 0; i < frameSize; i++) {
-						scanLine[i] = adg[b][i];
-					}
+                    System.arraycopy(adg[b], 0, scanLine, 0, frameSize);
 				}
 
 				// Get output product data for current frame.
@@ -455,9 +449,7 @@ public class AnalyticalPN extends ProcessingNode {
 				// Make it useable.
 				byte[] scanLine = (byte[]) data.getElems();
 				// Write data
-				for (int i = 0; i < frameSize; i++) {
-					scanLine[i] = (byte) analyticalFlagData[i];
-				}
+                System.arraycopy(analyticalFlagData, 0, scanLine, 0, frameSize);
 			} finally {
 				subPM.done();
 			}
@@ -467,14 +459,8 @@ public class AnalyticalPN extends ProcessingNode {
 		}
 	}
 
-	/**
+	/*
 	 * Steps 0 through 6 of QAA v5.
-	 * 
-	 * @param frameSize
-	 *            size of current frame
-	 * @param pm
-	 *            progress monitor
-	 * @throws ImaginaryNumberException
 	 */
 	protected void qaaf_v5(float[] Rrs, float[] rrs, float[] a, float[] bbp,
 			ProgressMonitor pm) throws ImaginaryNumberException {
@@ -564,11 +550,8 @@ public class AnalyticalPN extends ProcessingNode {
 		pm.worked(1);
 	}
 
-	/**
+	/*
 	 * Steps 7 through 10 of QAA v5.
-	 * 
-	 * @param frameSize
-	 * @param pm
 	 */
 	protected void qaaf_decomp(float[] rrs, float[] a, float[] aph,
 			float[] adg, ProgressMonitor pm) {
