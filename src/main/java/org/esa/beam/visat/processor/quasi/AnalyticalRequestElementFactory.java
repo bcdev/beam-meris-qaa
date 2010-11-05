@@ -20,7 +20,7 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 
 	/**
 	 * Returns an instance of AnalysisRequestElementFactory.
-	 * 
+	 *
 	 * @return _instance AnalysisRequestElementFactory instance
 	 */
 	public static AnalyticalRequestElementFactory getInstance() {
@@ -32,12 +32,12 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 
 	/**
 	 * Creates a new processing parameter for the current processing request.
-	 * 
+	 *
 	 * @param name
 	 *            the parameter name, must not be null or empty
 	 * @param value
 	 *            the parameter value, an be null if not yet known
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if name is null or empty
 	 * @throws org.esa.beam.framework.processor.RequestElementFactoryException
@@ -85,10 +85,10 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 
 	/**
 	 * Creates a default logging pattern parameter set to the prefix passed in.
-	 * 
+	 *
 	 * @param prefix
 	 *            the default setting for the logging pattern
-	 * 
+	 *
 	 * @return a logging pattern parameter conforming to the system settings
 	 */
 	public Parameter createDefaultLogPatternParameter(String prefix) {
@@ -97,7 +97,7 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 
 	/**
 	 * Creates a logging to output product parameter set to false.
-	 * 
+	 *
 	 * @return the created logging to output product parameter
 	 */
 	public Parameter createLogToOutputParameter(final String value)
@@ -119,11 +119,11 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 	/**
 	 * Creates aph check parameter.
 	 */
-	public Parameter createPiCheckFormatParameter(final String value) 
+	public Parameter createPiCheckFormatParameter(final String value)
 									throws ParamValidateException {
 		final ParamProperties props = _defFactory.createBooleanParamProperties();
 		final Parameter param;
-	
+
 		props.setLabel(AnalyticalConstants.PI_CHECK_LABELTEXT);
 		props.setDescription(AnalyticalConstants.PI_CHECK_DESCRIPTION);
 		props.setDefaultValue(true);
@@ -136,18 +136,18 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 		}
 		return param;
 	}
-	
+
 	/**
 	 * Creates a new reference to an input product for the current processing
 	 * request.
-	 * 
+	 *
 	 * @param url
 	 *            the input product's URL, must not be null
 	 * @param fileType
 	 *            the file format, can be null if not known
 	 * @param typeId
 	 *            the product type identifier, can be null if not known
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if url is null
 	 * @throws org.esa.beam.framework.processor.RequestElementFactoryException
@@ -162,14 +162,14 @@ public class AnalyticalRequestElementFactory implements RequestElementFactory {
 	/**
 	 * Creates a new reference to an output product for the current processing
 	 * request.
-	 * 
+	 *
 	 * @param url
 	 *            the output product's URL, must not be null
 	 * @param fileType
 	 *            the file format, can be null if not known
 	 * @param typeId
 	 *            the product type identifier, can be null if not known
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if url is null
 	 * @throws org.esa.beam.framework.processor.RequestElementFactoryException

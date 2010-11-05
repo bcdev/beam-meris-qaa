@@ -11,11 +11,14 @@ import java.util.logging.Logger;
 
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
-import org.esa.beam.framework.datamodel.BitmaskDef;
+//import org.esa.beam.framework.datamodel.BitmaskDef;
+import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+//import org.esa.beam.framework.datamodel.ProductNodeGroup;
+import org.esa.beam.framework.datamodel.SampleCoding;
 import org.esa.beam.util.logging.BeamLogManager;
 import org.esa.beam.visat.processor.quasi.exceptions.ImaginaryNumberException;
 
@@ -43,16 +46,15 @@ public class AnalyticalPN extends ProcessingNode {
 	 * QAA constants
 	 */
 	// Coefficients QAA v5, from Zhongping Lee's QAA v5
-    // v 1.0.1
-    // public static final double[] acoefs = { -1.146, -1.366, -.469 };
-    // v 1.0.2
-    public static final double[] acoefs = { -1.273, -1.163, -0.295 };
-
+	//public static final double[] acoefs = { -1.146, -1.366, -.469 };
+	public static final double[] acoefs = { -1.273, -1.163, -0.295 };
 	public static final int[] wavel = { 412, 443, 490, 510, 560, 620 };
 
 	// aw and bbw coefficients from IOP datafile
-	public static final double[] aw = { 0.00469, 0.00721, 0.015, 0.0325, 0.0619, 0.2755 };
-	public static final double[] bbw = { 0.003328, 0.0023885, 0.001549, 0.0012992, 0.0008994, 0.0005996 };
+	public static final double[] aw = { 0.00469, 0.00721, 0.015, 0.0325,
+			0.0619, 0.2755 };
+	public static final double[] bbw = { 0.003328, 0.0023885, 0.001549,
+			0.0012992, 0.0008994, 0.0005996 };
 
 	// Hard-coded here, could be adjusted in user interface
 	private float a_lower_bound = -5.0f;
@@ -73,7 +75,7 @@ public class AnalyticalPN extends ProcessingNode {
 
 	public static final String FLAG_CODING = "analytical_flag";
 	public static final String ANALYSIS_FLAG_BAND_NAME = "analytical_flags";
-	
+
 	private static final byte FLAG_INVALID = 8;
 
 	private static final byte FLAG_NEGATIVE_ADG = 4;
@@ -218,16 +220,22 @@ public class AnalyticalPN extends ProcessingNode {
 
 		final FlagCoding flagCoding = new FlagCoding(FLAG_CODING);
 		flagCoding.setDescription("QAA-for-IOP specific flags");
-		outputProduct.addFlagCoding(flagCoding);
+		//outputProduct.addFlagCoding(flagCoding);
+		outputProduct.getFlagCodingGroup().add(flagCoding);
 
 		MetadataAttribute analyticalAttr = new MetadataAttribute("nomral",
 				ProductData.TYPE_UINT8);
 		analyticalAttr.getData().setElemInt(FLAG_VALID);
 		analyticalAttr.setDescription("A valid water pixel.");
 		flagCoding.addAttribute(analyticalAttr);
-		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
+
+		outputProduct.getMaskGroup().add(Mask.BandMathsType.create(analyticalAttr.getName(),
+				analyticalAttr.getDescription(), outputProduct.getSceneRasterWidth(), outputProduct.getSceneRasterHeight(), flagCoding.getName() + "."
+						+ analyticalAttr.getName(), Color.BLUE, 0.5f));
+/*		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
 				analyticalAttr.getDescription(), flagCoding.getName() + "."
 						+ analyticalAttr.getName(), Color.BLUE, 0.5f));
+*/
 
 		analyticalAttr = new MetadataAttribute("Imaginary number",
 				ProductData.TYPE_UINT8);
@@ -235,9 +243,13 @@ public class AnalyticalPN extends ProcessingNode {
 		analyticalAttr
 				.setDescription("Classified as water, but an imaginary number would have been produced.");
 		flagCoding.addAttribute(analyticalAttr);
-		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
+
+		outputProduct.getMaskGroup().add(Mask.BandMathsType.create(analyticalAttr.getName(), analyticalAttr.getDescription(), outputProduct.getSceneRasterWidth(), outputProduct.getSceneRasterHeight(), flagCoding.getName() + "."
+				+ analyticalAttr.getName(), Color.RED, 0.5f));
+/*		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
 				analyticalAttr.getDescription(), flagCoding.getName() + "."
-						+ analyticalAttr.getName(), Color.RED, 0.5f));
+				+ analyticalAttr.getName(), Color.RED, 0.5f));
+*/
 
 		analyticalAttr = new MetadataAttribute("Negative Adg",
 				ProductData.TYPE_UINT8);
@@ -245,9 +257,14 @@ public class AnalyticalPN extends ProcessingNode {
 		analyticalAttr
 				.setDescription("Classified as water, but one or more of the bands contain a negative Adg value.");
 		flagCoding.addAttribute(analyticalAttr);
-		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
+
+		outputProduct.getMaskGroup().add(Mask.BandMathsType.create(analyticalAttr.getName(),
+				analyticalAttr.getDescription(), outputProduct.getSceneRasterWidth(), outputProduct.getSceneRasterHeight(), flagCoding.getName() + "."
+						+ analyticalAttr.getName(), Color.YELLOW, 0.5f));
+/*		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
 				analyticalAttr.getDescription(), flagCoding.getName() + "."
 						+ analyticalAttr.getName(), Color.YELLOW, 0.5f));
+*/
 
 		analyticalAttr = new MetadataAttribute("non-water",
 				ProductData.TYPE_UINT8);
@@ -255,13 +272,22 @@ public class AnalyticalPN extends ProcessingNode {
 		analyticalAttr
 				.setDescription("Not classified as a water pixel (land/cloud).");
 		flagCoding.addAttribute(analyticalAttr);
-		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
+
+		outputProduct.getMaskGroup().add(Mask.BandMathsType.create(analyticalAttr.getName(),
+				analyticalAttr.getDescription(), outputProduct.getSceneRasterWidth(), outputProduct.getSceneRasterHeight(), flagCoding.getName() + "."
+						+ analyticalAttr.getName(), Color.BLACK, 0.5f));
+/*		outputProduct.addBitmaskDef(new BitmaskDef(analyticalAttr.getName(),
 				analyticalAttr.getDescription(), flagCoding.getName() + "."
 						+ analyticalAttr.getName(), Color.BLACK, 0.5f));
+*/
 
 		analyticalFlagBand = new Band(ANALYSIS_FLAG_BAND_NAME,
 				ProductData.TYPE_UINT8, sceneWidth, sceneHeight);
-		analyticalFlagBand.setFlagCoding(flagCoding);
+		//analyticalFlagBand.setFlagCoding(flagCoding);
+		SampleCoding flagSampleCoding = new SampleCoding("analytical band flag coding");
+		flagSampleCoding.addElement(flagCoding);
+		analyticalFlagBand.setSampleCoding(flagSampleCoding);
+
 		outputProduct.addBand(analyticalFlagBand);
 
 		_logger.info("Output product successfully created");
@@ -270,7 +296,7 @@ public class AnalyticalPN extends ProcessingNode {
 
 	/**
 	 * Process a frame and write results to output product.
-	 * 
+	 *
 	 * @param frameX
 	 *            frame x position
 	 * @param frameY
@@ -314,15 +340,15 @@ public class AnalyticalPN extends ProcessingNode {
 			float[][] bb = new float[5][frameSize];
 			float[][] aph = new float[3][frameSize];
 			float[][] adg = new float[3][frameSize];
-			
+
 			// Pi check see if Rrs/3.14 is needed
 			double denom_pi = 1.0;
 			if (pi_check) {
 				denom_pi = Math.PI;
 			}
-			
+
 			for (int i = 0; i < frameSize; i++) {
-				
+
 				/**
 				 * Note: -Values below the value of clouds is considered water.
 				 * -0 is used for non-water areas.
@@ -335,7 +361,7 @@ public class AnalyticalPN extends ProcessingNode {
 						for (int b = 0; b < pixel.length; b++) {
 							pixel[b] = (float) (Rrs[b][i] / denom_pi);
 						}
-						
+
 						float[] rrs_pixel = new float[7];
 						float[] a_pixel = new float[6];
 						float[] bbp_pixel = new float[6];
@@ -417,7 +443,9 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-                    System.arraycopy(a[b], 0, scanLine, 0, frameSize);
+					for (int i = 0; i < frameSize; i++) {
+						scanLine[i] = a[b][i];
+					}
 				}
 				for (int b = 0; b < QaaBbBands.length; b++) {
 					// Get output product data for current frame.
@@ -425,7 +453,9 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-                    System.arraycopy(bb[b], 0, scanLine, 0, frameSize);
+					for (int i = 0; i < frameSize; i++) {
+						scanLine[i] = bb[b][i];
+					}
 				}
 				for (int b = 0; b < QaaAphBands.length; b++) {
 					// Get output product data for current frame.
@@ -433,7 +463,9 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-                    System.arraycopy(aph[b], 0, scanLine, 0, frameSize);
+					for (int i = 0; i < frameSize; i++) {
+						scanLine[i] = aph[b][i];
+					}
 				}
 				for (int b = 0; b < QaaAdgBands.length; b++) {
 					// Get output product data for current frame.
@@ -441,7 +473,9 @@ public class AnalyticalPN extends ProcessingNode {
 					// Make it useable.
 					float[] scanLine = (float[]) data.getElems();
 					// Write data
-                    System.arraycopy(adg[b], 0, scanLine, 0, frameSize);
+					for (int i = 0; i < frameSize; i++) {
+						scanLine[i] = adg[b][i];
+					}
 				}
 
 				// Get output product data for current frame.
@@ -449,7 +483,9 @@ public class AnalyticalPN extends ProcessingNode {
 				// Make it useable.
 				byte[] scanLine = (byte[]) data.getElems();
 				// Write data
-                System.arraycopy(analyticalFlagData, 0, scanLine, 0, frameSize);
+				for (int i = 0; i < frameSize; i++) {
+					scanLine[i] = (byte) analyticalFlagData[i];
+				}
 			} finally {
 				subPM.done();
 			}
@@ -459,8 +495,14 @@ public class AnalyticalPN extends ProcessingNode {
 		}
 	}
 
-	/*
+	/**
 	 * Steps 0 through 6 of QAA v5.
+	 *
+	 * @param frameSize
+	 *            size of current frame
+	 * @param pm
+	 *            progress monitor
+	 * @throws ImaginaryNumberException
 	 */
 	protected void qaaf_v5(float[] Rrs, float[] rrs, float[] a, float[] bbp,
 			ProgressMonitor pm) throws ImaginaryNumberException {
@@ -488,7 +530,7 @@ public class AnalyticalPN extends ProcessingNode {
 			 || Rrs[idx670] == noDataValue) {
 			Rrs[idx670] = Rrs670;
 		}
-		
+
 		// step 0.2 prepare rrs
 		for (int b = 0; b < Rrs.length; b++) {
 			rrs[b] = (float) (Rrs[b] / (0.52 + 1.7 * Rrs[b]));
@@ -550,8 +592,11 @@ public class AnalyticalPN extends ProcessingNode {
 		pm.worked(1);
 	}
 
-	/*
+	/**
 	 * Steps 7 through 10 of QAA v5.
+	 *
+	 * @param frameSize
+	 * @param pm
 	 */
 	protected void qaaf_decomp(float[] rrs, float[] a, float[] aph,
 			float[] adg, ProgressMonitor pm) {
@@ -590,9 +635,9 @@ public class AnalyticalPN extends ProcessingNode {
 	}
 
 	public void setAphCheck(boolean pi_check){
-		this.pi_check = pi_check;		
+		this.pi_check = pi_check;
 	}
-	
+
 	public void startProcessing(float a_lower, float a_upper, float bb_lower,
 			float bb_upper, float aph_lower, float aph_upper, float adg_upper){
 		a_lower_bound = a_lower;

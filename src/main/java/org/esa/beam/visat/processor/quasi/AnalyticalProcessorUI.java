@@ -63,11 +63,11 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Retrieves the requests currently edited.
-	 * 
+	 *
 	 * @throws ProcessorException
 	 *             if outputProductParam is empty string
 	 */
-	public Vector getRequests() throws ProcessorException {
+	public Vector<Request> getRequests() throws ProcessorException {
 		final Vector<Request> requests = new Vector<Request>();
 		final Parameter outputProductParam = _paramGroup
 				.getParameter(AnalyticalConstants.OUTPUT_PRODUCT_PARAM_NAME);
@@ -80,7 +80,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Sets a new request list to be edited.
-	 * 
+	 *
 	 * @param requests
 	 *            the request list to be edited must not be null
 	 */
@@ -150,7 +150,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 					+ AnalyticalConstants.LOG_TO_OUTPUT_PARAM_NAME + "'");
 			Debug.trace(e);
 		}
-		
+
 		_paramGroup
 		.addParameter(_factory
 				.createDefaultLogPatternParameter(AnalyticalConstants.DEFAULT_LOG_PREFIX));
@@ -361,8 +361,8 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 		GridBagUtils.setAttributes(gbc,
 				"insets.bottom=0, anchor=SOUTHWEST, fill=HORIZONTAL, weighty=0.5");
 		GridBagUtils.addToPanel(panel, param.getEditor().getComponent(), gbc);
-		
-		
+
+
 		/*
 		// log information
 		param = _paramGroup
@@ -392,21 +392,25 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 	/**
 	 * Checks to see if a parameter is empty string. If so it returns true, else
 	 * false.
-	 * 
+	 *
 	 * @param parameter
 	 *            parameter to test for empty string
-	 * 
+	 *
 	 * @return true if parameter is empty string, else false
 	 */
 	private static boolean hasParameterEmptyString(final Parameter parameter) {
 		final String valueAsText = parameter.getValueAsText();
-        return valueAsText.trim().length() <= 0;
+		if (valueAsText.trim().length() <= 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
 	 * Creates a request with all the parameters set to their respective
 	 * defaults.
-	 * 
+	 *
 	 * @return the default request
 	 */
 	private Request createDefaultRequest() {
@@ -415,7 +419,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Creates a request.
-	 * 
+	 *
 	 * @return the request
 	 */
 	private Request createRequest() {
@@ -450,7 +454,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Creates an input product reference from the request.
-	 * 
+	 *
 	 * @return the product reference
 	 */
 	private ProductRef createInputProductRef() {
@@ -461,7 +465,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Creates an output product reference from the request.
-	 * 
+	 *
 	 * @return the product reference
 	 */
 	private ProductRef createOutputProductRef() {
@@ -481,7 +485,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Update output format parameter.
-	 * 
+	 *
 	 * @param request
 	 *            request to update
 	 */
@@ -494,7 +498,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Update output file parameter.
-	 * 
+	 *
 	 * @param request
 	 *            request to update
 	 */
@@ -506,7 +510,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Update input file parameter.
-	 * 
+	 *
 	 * @param request
 	 *            request to update
 	 */
@@ -518,7 +522,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 
 	/**
 	 * Update log parameter.
-	 * 
+	 *
 	 * @param request
 	 *            request to update
 	 */
@@ -555,7 +559,7 @@ public class AnalyticalProcessorUI extends AbstractProcessorUI {
 			return;
 		}
 		String msg = null;
-		Product product;
+		Product product = null;
 		try {
 			product = ProductIO.readProduct(file);
 			if (product != null) {
