@@ -2,26 +2,27 @@
 
 package org.esa.beam.visat.processor.quasi;
 
-import java.awt.Rectangle;
-
 import org.esa.beam.util.Guardian;
+
+import java.awt.Rectangle;
 
 public class AnalyticalFrameSizeCalculator {
 
-	private int sceneWidth;
-	private int sceneHeight;
-	private int maxHeight;
+    private int sceneWidth;
+    private int sceneHeight;
+    private int maxHeight;
 
-	public AnalyticalFrameSizeCalculator(final int width, final int height) {
-		sceneWidth = width;
-		sceneHeight = height;
-		if(height < 240)
-			maxHeight = 1;
-		else
-			maxHeight = 16;
-	}
+    public AnalyticalFrameSizeCalculator(final int width, final int height) {
+        sceneWidth = width;
+        sceneHeight = height;
+        if (height < 240) {
+            maxHeight = 1;
+        } else {
+            maxHeight = 16;
+        }
+    }
 
-	public void addMinFrameSize(final int width, final int height) {
+    public void addMinFrameSize(final int width, final int height) {
         Guardian.assertWithinRange("width", width, 0, sceneWidth);
         Guardian.assertWithinRange("height", height, 0, sceneHeight);
 
