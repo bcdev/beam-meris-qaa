@@ -21,7 +21,8 @@
     <changelog>
         <![CDATA[
         Changes in 1.0.2:<br/>
-        [QAA-1] Apply new coefficients for calculation of a560 (step 2)<br/>
+        [QAA-002] Typo in flag name<br/>
+        [QAA-001] Apply new coefficients for calculation of a560 (step 2)<br/>
         ]]>
     </changelog>
 
@@ -34,7 +35,7 @@
     <dependency>
         <module>beam-processing</module>
     </dependency>
-	<dependency>
+    <dependency>
         <module>beam-envisat-reader</module>
     </dependency>
     <dependency>
@@ -58,7 +59,7 @@
         </action>
     </extension>
 
-	<extension point="beam-ui:helpSets">
+    <extension point="beam-ui:helpSets">
         <helpSet>
             <parent>beam-help</parent>
             <path>doc/help/qaa_v4.hs</path>

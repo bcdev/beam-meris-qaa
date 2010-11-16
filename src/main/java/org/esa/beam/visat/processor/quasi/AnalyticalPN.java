@@ -211,7 +211,7 @@ public class AnalyticalPN extends ProcessingNode {
         flagCoding.setDescription("QAA-for-IOP specific flags");
         outputProduct.getFlagCodingGroup().add(flagCoding);
 
-        MetadataAttribute analyticalAttr = new MetadataAttribute("nomral", ProductData.TYPE_UINT8);
+        MetadataAttribute analyticalAttr = new MetadataAttribute("normal", ProductData.TYPE_UINT8);
         analyticalAttr.getData().setElemInt(FLAG_VALID);
         analyticalAttr.setDescription("A valid water pixel.");
         flagCoding.addAttribute(analyticalAttr);
@@ -247,7 +247,7 @@ public class AnalyticalPN extends ProcessingNode {
                                                           Color.YELLOW, 0.5f);
         outputProduct.getMaskGroup().add(negAdgMask);
 
-        analyticalAttr = new MetadataAttribute("non_water",ProductData.TYPE_UINT8);
+        analyticalAttr = new MetadataAttribute("non_water", ProductData.TYPE_UINT8);
         analyticalAttr.getData().setElemInt(FLAG_INVALID);
         analyticalAttr.setDescription("Not classified as a water pixel (land/cloud).");
         flagCoding.addAttribute(analyticalAttr);
@@ -463,7 +463,7 @@ public class AnalyticalPN extends ProcessingNode {
     /**
      * Steps 0 through 6 of QAA v5.
      *
-     * @param pm        progress monitor
+     * @param pm progress monitor
      *
      * @throws ImaginaryNumberException
      */
