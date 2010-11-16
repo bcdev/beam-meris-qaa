@@ -51,12 +51,12 @@
             <id>analyisisScientificTool</id>
             <class>org.esa.beam.visat.actions.ProcessorAction</class>
             <processor>org.esa.beam.visat.processor.quasi.AnalyticalProcessor</processor>
-            <text>QAA for IOP</text>
+            <text>QAA for IOP (MERIS)...</text>
             <shortDescr>Invoke the QAA for IOP processor</shortDescr>
             <mnemonic>Q</mnemonic>
             <parent>tools</parent>
             <helpID>quasiAnalysisTool</helpID>
-            <placeAfter>createFilteredBand</placeAfter>
+            <placeAfter>flhMciScientificTool</placeAfter>
         </action>
     </extension>
 
