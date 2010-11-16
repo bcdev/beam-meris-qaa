@@ -21,6 +21,7 @@
     <changelog>
         <![CDATA[
         Changes in 1.0.2:<br/>
+        [QAA-003] Performance can be increased<br/>
         [QAA-002] Typo in flag name<br/>
         [QAA-001] Apply new coefficients for calculation of a560 (step 2)<br/>
         ]]>

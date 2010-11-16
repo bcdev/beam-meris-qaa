@@ -382,7 +382,7 @@ public class AnalyticalPN extends ProcessingNode {
                             adg[b][i] = noDataValue;
                         }
                     }
-                } catch (ImaginaryNumberException e) {
+                } catch (ImaginaryNumberException ignored) {
                     analyticalFlagData[i] = AnalyticalPN.FLAG_IMAGINARY;
                     for (int b = 0; b < a.length; b++) {
                         a[b][i] = noDataValue;
@@ -408,9 +408,7 @@ public class AnalyticalPN extends ProcessingNode {
                     // Make it useable.
                     float[] scanLine = (float[]) data.getElems();
                     // Write data
-                    for (int i = 0; i < frameSize; i++) {
-                        scanLine[i] = a[b][i];
-                    }
+                    System.arraycopy(a[b], 0, scanLine, 0, frameSize);
                 }
                 for (int b = 0; b < QaaBbBands.length; b++) {
                     // Get output product data for current frame.
@@ -418,9 +416,7 @@ public class AnalyticalPN extends ProcessingNode {
                     // Make it useable.
                     float[] scanLine = (float[]) data.getElems();
                     // Write data
-                    for (int i = 0; i < frameSize; i++) {
-                        scanLine[i] = bb[b][i];
-                    }
+                    System.arraycopy(bb[b], 0, scanLine, 0, frameSize);
                 }
                 for (int b = 0; b < QaaAphBands.length; b++) {
                     // Get output product data for current frame.
@@ -428,9 +424,7 @@ public class AnalyticalPN extends ProcessingNode {
                     // Make it useable.
                     float[] scanLine = (float[]) data.getElems();
                     // Write data
-                    for (int i = 0; i < frameSize; i++) {
-                        scanLine[i] = aph[b][i];
-                    }
+                    System.arraycopy(aph[b], 0, scanLine, 0, frameSize);
                 }
                 for (int b = 0; b < QaaAdgBands.length; b++) {
                     // Get output product data for current frame.
@@ -438,9 +432,7 @@ public class AnalyticalPN extends ProcessingNode {
                     // Make it useable.
                     float[] scanLine = (float[]) data.getElems();
                     // Write data
-                    for (int i = 0; i < frameSize; i++) {
-                        scanLine[i] = adg[b][i];
-                    }
+                    System.arraycopy(adg[b], 0, scanLine, 0, frameSize);
                 }
 
                 // Get output product data for current frame.
@@ -448,9 +440,7 @@ public class AnalyticalPN extends ProcessingNode {
                 // Make it useable.
                 byte[] scanLine = (byte[]) data.getElems();
                 // Write data
-                for (int i = 0; i < frameSize; i++) {
-                    scanLine[i] = (byte) analyticalFlagData[i];
-                }
+                System.arraycopy(analyticalFlagData, 0, scanLine, 0, frameSize);
             } finally {
                 subPM.done();
             }
@@ -520,8 +510,7 @@ public class AnalyticalPN extends ProcessingNode {
         numer = rrs[idx440] + rrs[idx490];
         result = numer / denom;
         if (result <= 0) {
-            throw new ImaginaryNumberException(
-                    "Will produce an imaginary number", result);
+            throw new ImaginaryNumberException("Will produce an imaginary number", result);
         }
         rho = (float) Math.log10(result);
         rho = (float) (acoefs[0] + acoefs[1] * rho + acoefs[2] * Math.pow(rho, 2.0));
