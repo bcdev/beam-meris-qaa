@@ -473,13 +473,12 @@ public class AnalyticalPN extends ProcessingNode {
         // step 0.1 prepare Rrs670
         float Rrs670_upper;
         float Rrs670_lower;
-        float Rrs670;
         Rrs670_upper = (float) (20.0 * Math.pow(Rrs[idx560], 1.5));
         Rrs670_lower = (float) (0.9 * Math.pow(Rrs[idx560], 1.7));
-        Rrs670 = (float) (0.00018 * Math.pow(Rrs[idx490] / Rrs[idx560], 3.19));
-        Rrs670 += (float) (1.27 * Math.pow(Rrs[idx560], 1.47));
         // if Rrs[670] out of bounds, reassign its value by QAA v5.
         if (Rrs[idx670] > Rrs670_upper || Rrs[idx670] < Rrs670_lower || Rrs[idx670] == noDataValue) {
+            float Rrs670 = (float) (0.00018 * Math.pow(Rrs[idx490] / Rrs[idx560], 3.19));
+            Rrs670 += (float) (1.27 * Math.pow(Rrs[idx560], 1.47));
             Rrs[idx670] = Rrs670;
         }
 
@@ -506,7 +505,7 @@ public class AnalyticalPN extends ProcessingNode {
         float denom;
         float result;
 
-        denom = (float) (rrs[idx560] + 5 * rrs[idx670] * (rrs[idx670] / rrs[idx490]));
+        denom = rrs[idx560] + 5 * rrs[idx670] * (rrs[idx670] / rrs[idx490]);
         numer = rrs[idx440] + rrs[idx490];
         result = numer / denom;
         if (result <= 0) {
