@@ -43,15 +43,15 @@ public class AnalyticalPN extends ProcessingNode {
      */
     // Coefficients QAA v5, from Zhongping Lee's QAA v5
     //public static final double[] acoefs = { -1.146, -1.366, -.469 };
-    public static final double[] acoefs = {-1.273, -1.163, -0.295};
-    public static final int[] wavel = {412, 443, 490, 510, 560, 620};
+    private static final double[] acoefs = {-1.273, -1.163, -0.295};
+    private static final int[] wavel = {412, 443, 490, 510, 560, 620};
 
     // aw and bbw coefficients from IOP datafile
-    public static final double[] aw = {
+    private static final double[] aw = {
             0.00469, 0.00721, 0.015, 0.0325,
             0.0619, 0.2755
     };
-    public static final double[] bbw = {
+    private static final double[] bbw = {
             0.003328, 0.0023885, 0.001549,
             0.0012992, 0.0008994, 0.0005996
     };
@@ -135,10 +135,6 @@ public class AnalyticalPN extends ProcessingNode {
                 EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
                 EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
         };
-        final String qaa_a = "Qaa a ";
-        final String qaa_bb = "Qaa bb ";
-        final String qaa_aph = "Qaa aph ";
-        final String qaa_adg = "Qaa adg ";
         // input product
         sourceProduct = getSourceProduct();
 
@@ -161,6 +157,10 @@ public class AnalyticalPN extends ProcessingNode {
 
         // Setup our output bands
         // NOTE: We only compute 5 bands for a, bb and 3 bands for adg.
+        final String qaa_a = "Qaa a ";
+        final String qaa_bb = "Qaa bb ";
+        final String qaa_aph = "Qaa aph ";
+        final String qaa_adg = "Qaa adg ";
         QaaABands = new Band[5];
         for (int i = 0; i < QaaABands.length; i++) {
             QaaABands[i] = new Band(qaa_a + wavel[i], ProductData.TYPE_FLOAT32, sceneWidth, sceneHeight);
