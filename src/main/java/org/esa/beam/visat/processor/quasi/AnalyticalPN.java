@@ -211,22 +211,16 @@ public class AnalyticalPN extends ProcessingNode {
         flagCoding.setDescription("QAA-for-IOP specific flags");
         outputProduct.getFlagCodingGroup().add(flagCoding);
 
-        MetadataAttribute analyticalAttr = new MetadataAttribute("normal", ProductData.TYPE_UINT8);
-        analyticalAttr.getData().setElemInt(FLAG_VALID);
-        analyticalAttr.setDescription("A valid water pixel.");
-        flagCoding.addAttribute(analyticalAttr);
-
+        MetadataAttribute analyticalAttr = flagCoding.addFlag("normal", FLAG_VALID, "A valid water pixel.");
         final Mask normalMask = Mask.BandMathsType.create(analyticalAttr.getName(), analyticalAttr.getDescription(),
                                                           outputProduct.getSceneRasterWidth(),
                                                           outputProduct.getSceneRasterHeight(),
                                                           ANALYSIS_FLAG_BAND_NAME + "." + analyticalAttr.getName(),
                                                           Color.BLUE, 0.5f);
         outputProduct.getMaskGroup().add(normalMask);
-        analyticalAttr = new MetadataAttribute("Imaginary_number", ProductData.TYPE_UINT8);
-        analyticalAttr.getData().setElemInt(AnalyticalPN.FLAG_IMAGINARY);
-        analyticalAttr.setDescription("Classified as water, but an imaginary number would have been produced.");
-        flagCoding.addAttribute(analyticalAttr);
 
+        analyticalAttr = flagCoding.addFlag("Imaginary_number", FLAG_IMAGINARY,
+                                            "Classified as water, but an imaginary number would have been produced.");
         final Mask imagNumMask = Mask.BandMathsType.create(analyticalAttr.getName(), analyticalAttr.getDescription(),
                                                            outputProduct.getSceneRasterWidth(),
                                                            outputProduct.getSceneRasterHeight(),
@@ -234,12 +228,8 @@ public class AnalyticalPN extends ProcessingNode {
                                                            Color.RED, 0.5f);
         outputProduct.getMaskGroup().add(imagNumMask);
 
-        analyticalAttr = new MetadataAttribute("Negative_Adg", ProductData.TYPE_UINT8);
-        analyticalAttr.getData().setElemInt(FLAG_NEGATIVE_ADG);
-        analyticalAttr.setDescription(
-                "Classified as water, but one or more of the bands contain a negative Adg value.");
-        flagCoding.addAttribute(analyticalAttr);
-
+        analyticalAttr = flagCoding.addFlag("Negative_Adg", FLAG_NEGATIVE_ADG,
+                                            "Classified as water, but one or more of the bands contain a negative Adg value.");
         final Mask negAdgMask = Mask.BandMathsType.create(analyticalAttr.getName(), analyticalAttr.getDescription(),
                                                           outputProduct.getSceneRasterWidth(),
                                                           outputProduct.getSceneRasterHeight(),
@@ -247,11 +237,7 @@ public class AnalyticalPN extends ProcessingNode {
                                                           Color.YELLOW, 0.5f);
         outputProduct.getMaskGroup().add(negAdgMask);
 
-        analyticalAttr = new MetadataAttribute("non_water", ProductData.TYPE_UINT8);
-        analyticalAttr.getData().setElemInt(FLAG_INVALID);
-        analyticalAttr.setDescription("Not classified as a water pixel (land/cloud).");
-        flagCoding.addAttribute(analyticalAttr);
-
+        analyticalAttr = flagCoding.addFlag("non_water", FLAG_INVALID, "Not classified as a water pixel (land/cloud).");
         final Mask nonWaterMask = Mask.BandMathsType.create(analyticalAttr.getName(), analyticalAttr.getDescription(),
                                                             outputProduct.getSceneRasterWidth(),
                                                             outputProduct.getSceneRasterHeight(),
