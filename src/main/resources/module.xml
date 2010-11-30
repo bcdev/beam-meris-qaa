@@ -60,6 +60,22 @@
         </action>
     </extension>
 
+    <extension point="beam-ui:actions">
+        <action>
+            <id>merisQaaIOP</id>
+            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <text>QAA for IOP (MERIS) - GPF...</text>
+            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
+            <mnemonic>Q</mnemonic>
+            <parent>tools</parent>
+            <helpID>merisQaaIOP</helpID>
+            <placeAfter>flhMciScientificTool</placeAfter>
+            <operatorName>Meris.QaaIOP</operatorName>
+            <dialogTitle>QAA for IOP</dialogTitle>
+            <targetProductNameSuffix>_qaa</targetProductNameSuffix>
+        </action>
+    </extension>
+
     <extension point="beam-ui:helpSets">
         <helpSet>
             <parent>beam-help</parent>
