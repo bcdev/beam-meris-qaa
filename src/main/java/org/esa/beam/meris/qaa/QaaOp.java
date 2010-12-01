@@ -13,7 +13,6 @@ import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.experimental.PixelOperator;
 import org.esa.beam.util.ProductUtils;
-import org.esa.beam.visat.processor.quasi.exceptions.ImaginaryNumberException;
 
 import java.awt.Color;
 

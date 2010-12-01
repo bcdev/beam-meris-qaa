@@ -1,8 +1,6 @@
 package org.esa.beam.meris.qaa;
 
-import org.esa.beam.visat.processor.quasi.exceptions.ImaginaryNumberException;
-
-public class Qaa {
+class Qaa {
 
     public static final int[] WAVELENGTH = {412, 443, 490, 510, 560, 620};
 
@@ -27,7 +25,7 @@ public class Qaa {
 
     private float noDataValue;
 
-    public Qaa(float noDataValue) {
+    Qaa(float noDataValue) {
         this.noDataValue = noDataValue;
     }
 

@@ -14,8 +14,8 @@ import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.MetadataAttribute;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.meris.qaa.ImaginaryNumberException;
 import org.esa.beam.util.logging.BeamLogManager;
-import org.esa.beam.visat.processor.quasi.exceptions.ImaginaryNumberException;
 
 import java.awt.Color;
 import java.io.IOException;
