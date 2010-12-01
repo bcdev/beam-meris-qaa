@@ -21,6 +21,7 @@
     <changelog>
         <![CDATA[
         Changes in 1.0.2:<br/>
+        [QAA-004] Migrate QAA IOP Processor to GPF<br/>
         [QAA-003] Performance can be increased<br/>
         [QAA-002] Typo in flag name<br/>
         [QAA-001] Apply new coefficients for calculation of a560 (step 2)<br/>
@@ -46,29 +47,15 @@
 
     <categories>Application,Processor,MERIS</categories>
 
-    <extension point="beam-visat:actions">
-        <action>
-            <id>analyisisScientificTool</id>
-            <class>org.esa.beam.visat.actions.ProcessorAction</class>
-            <processor>org.esa.beam.visat.processor.quasi.AnalyticalProcessor</processor>
-            <text>QAA for IOP (MERIS)...</text>
-            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
-            <mnemonic>Q</mnemonic>
-            <parent>tools</parent>
-            <helpID>quasiAnalysisTool</helpID>
-            <placeAfter>flhMciScientificTool</placeAfter>
-        </action>
-    </extension>
-
     <extension point="beam-ui:actions">
         <action>
             <id>merisQaaIOP</id>
             <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
-            <text>QAA for IOP (MERIS) - GPF...</text>
+            <text>QAA for IOP (MERIS)...</text>
             <shortDescr>Invoke the QAA for IOP processor</shortDescr>
             <mnemonic>Q</mnemonic>
             <parent>tools</parent>
-            <helpID>QAATool</helpID>
+            <helpId>QAATool</helpId>
             <placeAfter>flhMciScientificTool</placeAfter>
             <operatorName>Meris.QaaIOP</operatorName>
             <dialogTitle>QAA for IOP</dialogTitle>
