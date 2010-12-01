@@ -66,19 +66,26 @@ public class QaaOp extends PixelOperator {
 
     @Parameter(alias = "aLowerBound", defaultValue = "-0.02", label = "'A' Lower Bound")
     private float a_lower;
-    @Parameter(alias = "aUpperBound", defaultValue = "5.0", label = "'A' Upper Bound")
+    @Parameter(alias = "aUpperBound", defaultValue = "5.0", label = "'A' Upper Bound",
+               description = "The upper bound of the valid value range.")
     private float a_upper;
-    @Parameter(alias = "bbLowerBound", defaultValue = "-0.2", label = "'BB' Lower Bound")
+    @Parameter(alias = "bbLowerBound", defaultValue = "-0.2", label = "'BB' Lower Bound",
+               description = "The lower bound of the valid value range.")
     private float bb_lower;
-    @Parameter(alias = "bbUpperBound", defaultValue = "5.0", label = "'BB' Upper Bound")
+    @Parameter(alias = "bbUpperBound", defaultValue = "5.0", label = "'BB' Upper Bound",
+               description = "The upper bound of the valid value range.")
     private float bb_upper;
-    @Parameter(alias = "aphLowerBound", defaultValue = "-0.02", label = "'APH' Lower Bound")
+    @Parameter(alias = "aphLowerBound", defaultValue = "-0.02", label = "'APH' Lower Bound",
+               description = "The lower bound of the valid value range.")
     private float aph_lower;
-    @Parameter(alias = "aphUpperBound", defaultValue = "3.0", label = "'APH' Upper Bound")
+    @Parameter(alias = "aphUpperBound", defaultValue = "3.0", label = "'APH' Upper Bound",
+               description = "The upper bound of the valid value range.")
     private float aph_upper;
-    @Parameter(alias = "adgUpperBound", defaultValue = "1.0", label = "'ADG' Upper Bound")
+    @Parameter(alias = "adgUpperBound", defaultValue = "1.0", label = "'ADG' Upper Bound",
+               description = "The upper bound of the valid value range. The lower bound is always 0.")
     private float adg_upper;
-    @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)")
+    @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)",
+               description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
     private Qaa qaa;
