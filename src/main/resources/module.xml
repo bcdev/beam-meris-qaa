@@ -68,7 +68,7 @@
             <shortDescr>Invoke the QAA for IOP processor</shortDescr>
             <mnemonic>Q</mnemonic>
             <parent>tools</parent>
-            <helpID>merisQaaIOP</helpID>
+            <helpID>QAATool</helpID>
             <placeAfter>flhMciScientificTool</placeAfter>
             <operatorName>Meris.QaaIOP</operatorName>
             <dialogTitle>QAA for IOP</dialogTitle>

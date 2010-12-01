@@ -1,5 +1,6 @@
 package org.esa.beam.meris.qaa;
 
+import com.bc.ceres.glevel.MultiLevelImage;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
@@ -16,6 +17,7 @@ import org.esa.beam.visat.processor.quasi.exceptions.ImaginaryNumberException;
 
 import java.awt.Color;
 
+@SuppressWarnings({"UnusedDeclaration"})
 @OperatorMetadata(alias = "Meris.QaaIOP",
                   description = "QAA for IOP.",
                   authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
@@ -23,17 +25,19 @@ import java.awt.Color;
                   version = "1.0.2")
 public class QaaOp extends PixelOperator {
 
-    public static final String PRODUCT_TYPE = "QAA_L2";
-    private static final String FLAG_CODING = "analytical_flag";
-    private static final String ANALYSIS_FLAG_BAND_NAME = "analytical_flags";
-    private static final int[] WAVELENGTH = {412, 443, 490, 510, 560, 620};
+    private static final String PRODUCT_TYPE = "QAA_L2";
+    private static final String FLAG_CODING = "analytical_flags";
+    private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
     private static final float NO_DATA_VALUE = Float.MAX_VALUE;
     private static final int CLOUD_THRESHOLD = 4194304;
+    private static final String MERIS_L2_FLAGS_BAND_NAME = "l2_flags";
+    private static final int L2_WATER_FLAG_INDEX = 21;
 
     private static final int[] A_INDEXES = {0, 1, 2, 3, 4};
     private static final int[] BB_INDEXES = {5, 6, 7, 8, 9};
     private static final int[] APH_INDEXES = {10, 11, 12};
     private static final int[] ADG_INDEXES = {13, 14, 15};
+    private static final int FLAG_INDEX = 16;
     private static final byte FLAG_INVALID = 8;
     private static final byte FLAG_NEGATIVE_ADG = 4;
     private static final byte FLAG_IMAGINARY = 2;
@@ -58,7 +62,7 @@ public class QaaOp extends PixelOperator {
                            EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
                            EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
                            EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME,
-                           "l2_flags"
+                           MERIS_L2_FLAGS_BAND_NAME
                    })
     private Product sourceProduct;
 
@@ -79,24 +83,23 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)")
     private boolean divideByPI;
 
-    private double denomPI = 1.0;
     private Qaa qaa;
 
     @Override
     protected void configureTargetProduct(Product targetProduct) {
         for (int i = 0; i < A_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa a ", WAVELENGTH[i], "Quasi-Analytical a - ");
+            addBand(targetProduct, "Qaa a ", Qaa.WAVELENGTH[i], "Quasi-Analytical a - ");
         }
         for (int i = 0; i < BB_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa bb ", WAVELENGTH[i], "Quasi-Analytical bb - ");
+            addBand(targetProduct, "Qaa bb ", Qaa.WAVELENGTH[i], "Quasi-Analytical bb - ");
         }
 
         for (int i = 0; i < APH_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa aph ", WAVELENGTH[i], "Quasi-Analytical aph - ");
+            addBand(targetProduct, "Qaa aph ", Qaa.WAVELENGTH[i], "Quasi-Analytical aph - ");
         }
 
         for (int i = 0; i < ADG_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa adg ", WAVELENGTH[i], "Quasi-Analytical adg - ");
+            addBand(targetProduct, "Qaa adg ", Qaa.WAVELENGTH[i], "Quasi-Analytical adg - ");
         }
 
         final int sceneWidth = targetProduct.getSceneRasterWidth();
@@ -123,7 +126,9 @@ public class QaaOp extends PixelOperator {
         analyticalFlagBand.setSampleCoding(flagCoding);
         targetProduct.addBand(analyticalFlagBand);
 
-        ProductUtils.copyFlagBands(getSourceProduct(), targetProduct);
+        ProductUtils.copyFlagBands(sourceProduct, targetProduct);
+        final MultiLevelImage l2FlagsSourceImage = sourceProduct.getBand(MERIS_L2_FLAGS_BAND_NAME).getSourceImage();
+        targetProduct.getBand(MERIS_L2_FLAGS_BAND_NAME).setSourceImage(l2FlagsSourceImage);
 
         targetProduct.setProductType(PRODUCT_TYPE);
 
@@ -134,13 +139,9 @@ public class QaaOp extends PixelOperator {
         for (int i = 0; i < 7; i++) {
             configurator.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
-        configurator.defineSample(7, "l2_flags");
+        configurator.defineSample(7, MERIS_L2_FLAGS_BAND_NAME);
 
-        if (divideByPI) {
-            denomPI = Math.PI;
-        }
         qaa = new Qaa(NO_DATA_VALUE);
-
     }
 
     @Override
@@ -154,29 +155,35 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
         final Sample l2FlagSample = sourceSamples[sourceSamples.length - 1];
-        if (l2FlagSample.getInt() >= CLOUD_THRESHOLD) {  // Check if it is water or not
-            handleInvalid(targetSamples, FLAG_INVALID);
-        } else {
+        /*
+         * Note: -Values below the value of clouds is considered water.
+         * -0 is used for non-water areas.
+         */
+        if (l2FlagSample.getBit(L2_WATER_FLAG_INDEX)) { // Check if it is water or not
             final float[] rrs = new float[sourceSamples.length - 1];
             for (int i = 0; i < rrs.length; i++) {
-                rrs[i] = (float) (sourceSamples[i].getFloat() / denomPI);
+                rrs[i] = sourceSamples[i].getFloat();
+                if (divideByPI) {    //Take care of Pi
+                    rrs[i] /= Math.PI;
+                }
             }
-            /**
-             * QAA v5 processing
-             */
-            // steps 0-6
-            // The length of pixel is 7 bands, rrs_pixel... are 6 bands
             try {
                 float[] rrs_pixel = new float[7];
                 float[] a_pixel = new float[6];
                 float[] bbp_pixel = new float[6];
                 float[] aph_pixel = new float[6];
                 float[] adg_pixel = new float[6];
+
+                /**
+                 * QAA v5 processing
+                 */
+                // steps 0-6
+                // The length of pixel is 7 bands, rrs_pixel... are 6 bands
                 qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel);
                 // steps 7-10
                 qaa.qaaf_decomp(rrs_pixel, a_pixel, aph_pixel, adg_pixel);
 
-                setFlag(targetSamples, FLAG_VALID);
+                targetSamples[FLAG_INDEX].set((int) FLAG_VALID);
 
                 for (int i = 0; i < A_INDEXES.length; i++) {
                     float a = (float) aw[i] + aph_pixel[i] + adg_pixel[i];
@@ -196,15 +203,17 @@ public class QaaOp extends PixelOperator {
                 for (int i = 0; i < ADG_INDEXES.length; i++) {
                     float adg = adg_pixel[i];
                     if (adg < 0) {
-                        setFlag(targetSamples, FLAG_NEGATIVE_ADG);
+                        targetSamples[FLAG_INDEX].set((int) FLAG_NEGATIVE_ADG);
                     }
                     adg = checkAgainstBounds(adg, 0.0f, adg_upper);
-                    targetSamples[APH_INDEXES[i]].set(adg);
+                    targetSamples[ADG_INDEXES[i]].set(adg);
                 }
 
             } catch (ImaginaryNumberException ignored) {
                 handleInvalid(targetSamples, FLAG_IMAGINARY);
             }
+        } else {
+            handleInvalid(targetSamples, FLAG_INVALID);
         }
 
 
@@ -218,14 +227,10 @@ public class QaaOp extends PixelOperator {
     }
 
     private void handleInvalid(WritableSample[] targetSamples, int flagIndex) {
-        setFlag(targetSamples, flagIndex);
+        targetSamples[FLAG_INDEX].set(flagIndex);
         for (int i = 0; i < targetSamples.length - 1; i++) {
             targetSamples[i].set(NO_DATA_VALUE);
         }
-    }
-
-    private void setFlag(WritableSample[] targetSamples, int flagValue) {
-        targetSamples[targetSamples.length - 1].set(flagValue);
     }
 
     private void addFlagAndMask(Product targetProduct, FlagCoding flagCoding, String flagName, String flagDescription,
@@ -254,5 +259,4 @@ public class QaaOp extends PixelOperator {
             super(QaaOp.class);
         }
     }
-
 }
