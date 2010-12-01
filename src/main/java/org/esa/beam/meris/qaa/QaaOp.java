@@ -29,7 +29,6 @@ public class QaaOp extends PixelOperator {
     private static final String FLAG_CODING = "analytical_flags";
     private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
     private static final float NO_DATA_VALUE = Float.MAX_VALUE;
-    private static final int CLOUD_THRESHOLD = 4194304;
     private static final String MERIS_L2_FLAGS_BAND_NAME = "l2_flags";
     private static final int L2_WATER_FLAG_INDEX = 21;
 
