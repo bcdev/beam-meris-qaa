@@ -13,9 +13,8 @@
 <p>This processor is used to derive absorption and backscattering
     coefficients of MERIS L2 images.&nbsp; Only pixels that are determined
     to be water are processed, other pixels (land, clouds) will be assigned
-    a "No Data" vlaue on all bands.&nbsp; The L2_Flag band is used to
-    determine if a pixel is water, land or cloud.&nbsp; Any flag band value
-    below the cloud threshold (4194304) is considered to be water.&nbsp;
+    a "No Data" value on all bands.&nbsp; The L2_Flag band is used to
+    determine if a pixel is water, land or cloud.&nbsp;
     Also, only bands that are under 650nm are used in the Quasi-Analytical
     Algorithm. Using the default MERIS band wavelengths, the first 6 bands
     are used in processing.</p>
