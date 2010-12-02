@@ -188,6 +188,7 @@ public class QaaOp extends PixelOperator {
                 // steps 7-10
                 qaa.qaaf_decomp(rrs_pixel, a_pixel, aph_pixel, adg_pixel);
 
+                // fill target samples
                 targetSamples[FLAG_INDEX].set((int) FLAG_VALID);
 
                 for (int i = 0; i < A_INDEXES.length; i++) {
