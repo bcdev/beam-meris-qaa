@@ -14,11 +14,11 @@ class Qaa {
     private static final double[] acoefs = {-1.273, -1.163, -0.295};
 
     // aw and bbw coefficients from IOP datafile
-    private static final double[] aw = {
+    private static final double[] AW_COEFS = {
             0.00469, 0.00721, 0.015, 0.0325,
             0.0619, 0.2755
     };
-    private static final double[] bbw = {
+    private static final double[] BBW_COEFS = {
             0.003328, 0.0023885, 0.001549,
             0.0012992, 0.0008994, 0.0005996
     };
@@ -82,10 +82,10 @@ class Qaa {
         }
         rho = (float) Math.log10(result);
         rho = (float) (acoefs[0] + acoefs[1] * rho + acoefs[2] * Math.pow(rho, 2.0));
-        a560 = (float) (aw[IDX_560] + Math.pow(10.0, rho));
+        a560 = (float) (AW_COEFS[IDX_560] + Math.pow(10.0, rho));
 
         // step 3
-        bbp560 = (float) (((u[IDX_560] * a560) / (1.0 - u[IDX_560])) - bbw[IDX_560]);
+        bbp560 = (float) (((u[IDX_560] * a560) / (1.0 - u[IDX_560])) - BBW_COEFS[IDX_560]);
 
         // step 4
         rat = rrs[IDX_440] / rrs[IDX_560];
@@ -98,7 +98,7 @@ class Qaa {
 
         // step 6
         for (int b = 0; b < Rrs.length - 1; b++) {
-            a[b] = (float) (((1.0 - u[b]) * (bbw[b] + bbp[b])) / u[b]);
+            a[b] = (float) (((1.0 - u[b]) * (BBW_COEFS[b] + bbp[b])) / u[b]);
         }
     }
 
@@ -126,12 +126,12 @@ class Qaa {
         // step 9 & 10s
         denom = zeta - symbol;
         dif1 = a[IDX_410] - symbol * a[IDX_440];
-        dif2 = (float) (aw[IDX_410] - symbol * aw[IDX_440]);
+        dif2 = (float) (AW_COEFS[IDX_410] - symbol * AW_COEFS[IDX_440]);
         ag440 = (dif1 - dif2) / denom;
         //NOTE: only the first 6 band of rrs[] are used
         for (int b = 0; b < rrs.length - 1; b++) {
             adg[b] = (float) (ag440 * Math.exp(-1 * S * (WAVELENGTH[b] - WAVELENGTH[IDX_440])));
-            aph[b] = (float) (a[b] - adg[b] - aw[b]);
+            aph[b] = (float) (a[b] - adg[b] - AW_COEFS[b]);
         }
     }
 
