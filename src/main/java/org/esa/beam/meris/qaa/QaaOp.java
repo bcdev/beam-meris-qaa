@@ -41,16 +41,6 @@ public class QaaOp extends PixelOperator {
     private static final byte FLAG_IMAGINARY = 2;
     private static final byte FLAG_VALID = 1;
 
-    // aw and bbw coefficients from IOP datafile
-    private static final double[] aw = {
-            0.00469, 0.00721, 0.015, 0.0325,
-            0.0619, 0.2755
-    };
-    private static final double[] bbw = {
-            0.003328, 0.0023885, 0.001549,
-            0.0012992, 0.0008994, 0.0005996
-    };
-
     @SourceProduct(alias = "source", description = "The source product.",
                    bands = {
                            EnvisatConstants.MERIS_L2_REFLEC_1_BAND_NAME,
@@ -192,12 +182,12 @@ public class QaaOp extends PixelOperator {
                 targetSamples[FLAG_INDEX].set((int) FLAG_VALID);
 
                 for (int i = 0; i < A_INDEXES.length; i++) {
-                    float a = (float) aw[i] + aph_pixel[i] + adg_pixel[i];
+                    float a = (float) Qaa.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
                     a = checkAgainstBounds(a, a_lower, a_upper);
                     targetSamples[A_INDEXES[i]].set(a);
                 }
                 for (int i = 0; i < BB_INDEXES.length; i++) {
-                    float bb = (float) bbw[i] + bbp_pixel[i];
+                    float bb = (float) Qaa.BBW_COEFS[i] + bbp_pixel[i];
                     bb = checkAgainstBounds(bb, bb_lower, bb_upper);
                     targetSamples[BB_INDEXES[i]].set(bb);
                 }
