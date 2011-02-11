@@ -1,6 +1,5 @@
 package org.esa.beam.meris.qaa;
 
-import com.bc.ceres.glevel.MultiLevelImage;
 import org.esa.beam.dataio.envisat.EnvisatConstants;
 import org.esa.beam.framework.datamodel.Band;
 import org.esa.beam.framework.datamodel.FlagCoding;
@@ -12,7 +11,6 @@ import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
 import org.esa.beam.framework.gpf.experimental.PixelOperator;
-import org.esa.beam.util.ProductUtils;
 
 import java.awt.Color;
 
@@ -40,6 +38,8 @@ public class QaaOp extends PixelOperator {
     private static final byte FLAG_NEGATIVE_ADG = 4;
     private static final byte FLAG_IMAGINARY = 2;
     private static final byte FLAG_VALID = 1;
+    private static final String WATER_MASK_NAME = "water";
+    private static final String INVALID_MASK_NAME = "agc_invalid";
 
     @SourceProduct(alias = "source", description = "The source product.",
                    bands = {
@@ -49,8 +49,7 @@ public class QaaOp extends PixelOperator {
                            EnvisatConstants.MERIS_L2_REFLEC_4_BAND_NAME,
                            EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
                            EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME,
-                           MERIS_L2_FLAGS_BAND_NAME
+                           EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
                    })
     private Product sourceProduct;
 
@@ -121,9 +120,14 @@ public class QaaOp extends PixelOperator {
         analyticalFlagBand.setSampleCoding(flagCoding);
         targetProduct.addBand(analyticalFlagBand);
 
-        ProductUtils.copyFlagBands(sourceProduct, targetProduct);
-        final MultiLevelImage l2FlagsSourceImage = sourceProduct.getBand(MERIS_L2_FLAGS_BAND_NAME).getSourceImage();
-        targetProduct.getBand(MERIS_L2_FLAGS_BAND_NAME).setSourceImage(l2FlagsSourceImage);
+//        ProductUtils.copyFlagBands(sourceProduct, targetProduct);
+//        final Band[] bands = targetProduct.getBands();
+//        for (Band band : bands) {
+//            if (band.isFlagBand()) {
+//                final MultiLevelImage flagsSourceImage = sourceProduct.getBand(band.getName()).getSourceImage();
+//                band.setSourceImage(flagsSourceImage);
+//            }
+//        }
 
         targetProduct.setProductType(PRODUCT_TYPE);
 
@@ -134,7 +138,12 @@ public class QaaOp extends PixelOperator {
         for (int i = 0; i < 7; i++) {
             configurator.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
-        configurator.defineSample(7, MERIS_L2_FLAGS_BAND_NAME);
+        if (isMerisL2Product()) {
+            configurator.defineSample(7, WATER_MASK_NAME);
+        } else {
+            configurator.defineSample(7, INVALID_MASK_NAME);
+        }
+
 
         qaa = new Qaa(NO_DATA_VALUE);
     }
@@ -142,19 +151,16 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void configureTargetSamples(Configurator configurator) {
         final String[] targetBandNames = getTargetProduct().getBandNames();
-        for (int i = 0; i < targetBandNames.length - 1; i++) { // all but the last band "l2_flags"
+        for (int i = 0; i < targetBandNames.length; i++) {
             configurator.defineSample(i, targetBandNames[i]);
         }
     }
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
-        final Sample l2FlagSample = sourceSamples[sourceSamples.length - 1];
-        /*
-         * Note: -Values below the value of clouds is considered water.
-         * -0 is used for non-water areas.
-         */
-        if (l2FlagSample.getBit(L2_WATER_FLAG_INDEX)) { // Check if it is water or not
+        final Sample maskSample = sourceSamples[sourceSamples.length - 1];
+
+        if (isSampleWater(maskSample)) { // Check if it is water
             final float[] rrs = new float[sourceSamples.length - 1];
             for (int i = 0; i < rrs.length; i++) {
                 rrs[i] = sourceSamples[i].getFloat();
@@ -213,6 +219,20 @@ public class QaaOp extends PixelOperator {
         }
 
 
+    }
+
+    private boolean isSampleWater(Sample maskSample) {
+        boolean isWater;
+        if(isMerisL2Product()) {
+            isWater = maskSample.getBoolean();
+        } else {
+            isWater = !maskSample.getBoolean();
+        }
+        return isWater;
+    }
+
+    private boolean isMerisL2Product() {
+        return sourceProduct.getBand(MERIS_L2_FLAGS_BAND_NAME) != null;
     }
 
     private float checkAgainstBounds(float value, float lowerBound, float upperBound) {
