@@ -6,6 +6,7 @@ import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
@@ -25,21 +26,21 @@ public class QaaOp extends PixelOperator {
     private static final String PRODUCT_TYPE = "QAA_L2";
     private static final String FLAG_CODING = "analytical_flags";
     private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
-    private static final float NO_DATA_VALUE = Float.MAX_VALUE;
+    private static final String WATER_MASK_NAME = "water";
+    private static final String INVALID_MASK_NAME = "agc_invalid";
     private static final String MERIS_L2_FLAGS_BAND_NAME = "l2_flags";
-    private static final int L2_WATER_FLAG_INDEX = 21;
 
     private static final int[] A_INDEXES = {0, 1, 2, 3, 4};
     private static final int[] BB_INDEXES = {5, 6, 7, 8, 9};
     private static final int[] APH_INDEXES = {10, 11, 12};
     private static final int[] ADG_INDEXES = {13, 14, 15};
     private static final int FLAG_INDEX = 16;
+    private static final int L2_WATER_FLAG_INDEX = 21;
     private static final byte FLAG_INVALID = 8;
     private static final byte FLAG_NEGATIVE_ADG = 4;
     private static final byte FLAG_IMAGINARY = 2;
     private static final byte FLAG_VALID = 1;
-    private static final String WATER_MASK_NAME = "water";
-    private static final String INVALID_MASK_NAME = "agc_invalid";
+    private static final float NO_DATA_VALUE = Float.MAX_VALUE;
 
     @SourceProduct(alias = "source", description = "The source product.",
                    bands = {
@@ -81,6 +82,8 @@ public class QaaOp extends PixelOperator {
 
     @Override
     protected void configureTargetProduct(Product targetProduct) {
+        validateSourceProduct();
+
         for (int i = 0; i < A_INDEXES.length; i++) {
             addBand(targetProduct, "Qaa a ", Qaa.WAVELENGTH[i], "Quasi-Analytical a - ");
         }
@@ -119,15 +122,6 @@ public class QaaOp extends PixelOperator {
         Band analyticalFlagBand = new Band(ANALYSIS_FLAG_BAND_NAME, ProductData.TYPE_UINT8, sceneWidth, sceneHeight);
         analyticalFlagBand.setSampleCoding(flagCoding);
         targetProduct.addBand(analyticalFlagBand);
-
-//        ProductUtils.copyFlagBands(sourceProduct, targetProduct);
-//        final Band[] bands = targetProduct.getBands();
-//        for (Band band : bands) {
-//            if (band.isFlagBand()) {
-//                final MultiLevelImage flagsSourceImage = sourceProduct.getBand(band.getName()).getSourceImage();
-//                band.setSourceImage(flagsSourceImage);
-//            }
-//        }
 
         targetProduct.setProductType(PRODUCT_TYPE);
 
@@ -217,13 +211,19 @@ public class QaaOp extends PixelOperator {
         } else {
             handleInvalid(targetSamples, FLAG_INVALID);
         }
+    }
 
-
+    private void validateSourceProduct() {
+        final Mask invalidMask = sourceProduct.getMaskGroup().get(INVALID_MASK_NAME);
+        if (!isMerisL2Product() && invalidMask == null) {
+            throw new OperatorException(
+                    "Source product must either be MERIS L2 or have been produced by Glint processor.");
+        }
     }
 
     private boolean isSampleWater(Sample maskSample) {
         boolean isWater;
-        if(isMerisL2Product()) {
+        if (isMerisL2Product()) {
             isWater = maskSample.getBoolean();
         } else {
             isWater = !maskSample.getBoolean();
