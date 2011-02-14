@@ -41,6 +41,10 @@ public class QaaOp extends PixelOperator {
     private static final byte FLAG_IMAGINARY = 2;
     private static final byte FLAG_VALID = 1;
     private static final float NO_DATA_VALUE = Float.MAX_VALUE;
+    private static final String A_TOTAL_PATTERN = "a_total_%d";
+    private static final String B_TOTAL_PATTERN = "b_total_%d";
+    private static final String A_PIG_PATTERN = "a_pig_%d";
+    private static final String A_YS_PATTERN = "a_ys_%d";
 
     @SourceProduct(alias = "source", description = "The source product.",
                    bands = {
@@ -85,25 +89,25 @@ public class QaaOp extends PixelOperator {
         validateSourceProduct();
 
         for (int i = 0; i < A_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa a ", Qaa.WAVELENGTH[i], "Quasi-Analytical a - ");
+            addBand(targetProduct, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i], "Total absorption coefficient of all water constituents at %d nm.");
         }
         for (int i = 0; i < BB_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa bb ", Qaa.WAVELENGTH[i], "Quasi-Analytical bb - ");
+            addBand(targetProduct, B_TOTAL_PATTERN, Qaa.WAVELENGTH[i], "Total scattering or backscattering.");
         }
 
         for (int i = 0; i < APH_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa aph ", Qaa.WAVELENGTH[i], "Quasi-Analytical aph - ");
+            addBand(targetProduct, A_PIG_PATTERN, Qaa.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
         }
 
         for (int i = 0; i < ADG_INDEXES.length; i++) {
-            addBand(targetProduct, "Qaa adg ", Qaa.WAVELENGTH[i], "Quasi-Analytical adg - ");
+            addBand(targetProduct, A_YS_PATTERN, Qaa.WAVELENGTH[i], "Yellow substance absorption coefficient at %d nm.");
         }
 
         final int sceneWidth = targetProduct.getSceneRasterWidth();
         final int sceneHeight = targetProduct.getSceneRasterHeight();
 
         final FlagCoding flagCoding = new FlagCoding(FLAG_CODING);
-        flagCoding.setDescription("QAA-for-IOP specific flags");
+        flagCoding.setDescription("QAA-for-IOP specific flags.");
         targetProduct.getFlagCodingGroup().add(flagCoding);
 
         addFlagAndMask(targetProduct, flagCoding, "normal",
@@ -260,9 +264,9 @@ public class QaaOp extends PixelOperator {
         targetProduct.getMaskGroup().add(mask);
     }
 
-    private Band addBand(Product targetProduct, String namePrefix, int wavelength, String descriptionPrefix) {
-        Band band = targetProduct.addBand(namePrefix + wavelength, ProductData.TYPE_FLOAT32);
-        band.setDescription(descriptionPrefix + wavelength + "nm");
+    private Band addBand(Product targetProduct, String namePattern, int wavelength, String descriptionPattern) {
+        Band band = targetProduct.addBand(String.format(namePattern, wavelength), ProductData.TYPE_FLOAT32);
+        band.setDescription(String.format(descriptionPattern, wavelength));
         band.setUnit("1/m");
         band.setNoDataValueUsed(true);
         band.setNoDataValue(NO_DATA_VALUE);
