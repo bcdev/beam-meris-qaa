@@ -42,7 +42,7 @@ public class QaaOp extends PixelOperator {
     private static final byte FLAG_VALID = 1;
     private static final float NO_DATA_VALUE = Float.MAX_VALUE;
     private static final String A_TOTAL_PATTERN = "a_total_%d";
-    private static final String B_TOTAL_PATTERN = "b_total_%d";
+    private static final String BB_SPM_PATTERN = "bb_spm_%d";
     private static final String A_PIG_PATTERN = "a_pig_%d";
     private static final String A_YS_PATTERN = "a_ys_%d";
 
@@ -89,10 +89,12 @@ public class QaaOp extends PixelOperator {
         validateSourceProduct();
 
         for (int i = 0; i < A_INDEXES.length; i++) {
-            addBand(targetProduct, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i], "Total absorption coefficient of all water constituents at %d nm.");
+            addBand(targetProduct, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i],
+                    "Total absorption coefficient of all water constituents at %d nm.");
         }
         for (int i = 0; i < BB_INDEXES.length; i++) {
-            addBand(targetProduct, B_TOTAL_PATTERN, Qaa.WAVELENGTH[i], "Total scattering or backscattering.");
+            addBand(targetProduct, BB_SPM_PATTERN, Qaa.WAVELENGTH[i],
+                    "Backscattering of suspended particulate matter at %d nm.");
         }
 
         for (int i = 0; i < APH_INDEXES.length; i++) {
@@ -100,7 +102,8 @@ public class QaaOp extends PixelOperator {
         }
 
         for (int i = 0; i < ADG_INDEXES.length; i++) {
-            addBand(targetProduct, A_YS_PATTERN, Qaa.WAVELENGTH[i], "Yellow substance absorption coefficient at %d nm.");
+            addBand(targetProduct, A_YS_PATTERN, Qaa.WAVELENGTH[i],
+                    "Yellow substance absorption coefficient at %d nm.");
         }
 
         final int sceneWidth = targetProduct.getSceneRasterWidth();
@@ -110,9 +113,7 @@ public class QaaOp extends PixelOperator {
         flagCoding.setDescription("QAA-for-IOP specific flags.");
         targetProduct.getFlagCodingGroup().add(flagCoding);
 
-        addFlagAndMask(targetProduct, flagCoding, "normal",
-                       "A valid water pixel.",
-                       FLAG_VALID, Color.BLUE);
+        addFlagAndMask(targetProduct, flagCoding, "normal", "A valid water pixel.", FLAG_VALID, Color.BLUE);
         addFlagAndMask(targetProduct, flagCoding, "Imaginary_number",
                        "Classified as water, but an imaginary number would have been produced.",
                        FLAG_IMAGINARY, Color.RED);
