@@ -11,7 +11,11 @@ import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
-import org.esa.beam.framework.gpf.experimental.PixelOperator;
+import org.esa.beam.framework.gpf.pointop.PixelOperator;
+import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
+import org.esa.beam.framework.gpf.pointop.Sample;
+import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
+import org.esa.beam.framework.gpf.pointop.WritableSample;
 
 import java.awt.Color;
 
@@ -85,30 +89,33 @@ public class QaaOp extends PixelOperator {
     private Qaa qaa;
 
     @Override
-    protected void configureTargetProduct(Product targetProduct) {
+    protected void prepareInputs() throws OperatorException {
         validateSourceProduct();
+    }
 
+    @Override
+    protected void configureTargetProduct(ProductConfigurer configurer) {
         for (int i = 0; i < A_INDEXES.length; i++) {
-            addBand(targetProduct, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i],
                     "Total absorption coefficient of all water constituents at %d nm.");
         }
         for (int i = 0; i < BB_INDEXES.length; i++) {
-            addBand(targetProduct, BB_SPM_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, BB_SPM_PATTERN, Qaa.WAVELENGTH[i],
                     "Backscattering of suspended particulate matter at %d nm.");
         }
 
         for (int i = 0; i < APH_INDEXES.length; i++) {
-            addBand(targetProduct, A_PIG_PATTERN, Qaa.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
+            addBand(configurer, A_PIG_PATTERN, Qaa.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
         }
 
         for (int i = 0; i < ADG_INDEXES.length; i++) {
-            addBand(targetProduct, A_YS_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, A_YS_PATTERN, Qaa.WAVELENGTH[i],
                     "Yellow substance absorption coefficient at %d nm.");
         }
 
+        Product targetProduct = configurer.getTargetProduct();
         final int sceneWidth = targetProduct.getSceneRasterWidth();
         final int sceneHeight = targetProduct.getSceneRasterHeight();
-
         final FlagCoding flagCoding = new FlagCoding(FLAG_CODING);
         flagCoding.setDescription("QAA-for-IOP specific flags.");
         targetProduct.getFlagCodingGroup().add(flagCoding);
@@ -132,15 +139,16 @@ public class QaaOp extends PixelOperator {
 
     }
 
+
     @Override
-    protected void configureSourceSamples(Configurator configurator) {
+    protected void configureSourceSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
         for (int i = 0; i < 7; i++) {
-            configurator.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
+            sampleConfigurer.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
         if (isMerisL2Product()) {
-            configurator.defineSample(7, WATER_MASK_NAME);
+            sampleConfigurer.defineSample(7, WATER_MASK_NAME);
         } else {
-            configurator.defineSample(7, INVALID_MASK_NAME);
+            sampleConfigurer.defineSample(7, INVALID_MASK_NAME);
         }
 
 
@@ -148,10 +156,10 @@ public class QaaOp extends PixelOperator {
     }
 
     @Override
-    protected void configureTargetSamples(Configurator configurator) {
+    protected void configureTargetSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
         final String[] targetBandNames = getTargetProduct().getBandNames();
         for (int i = 0; i < targetBandNames.length; i++) {
-            configurator.defineSample(i, targetBandNames[i]);
+            sampleConfigurer.defineSample(i, targetBandNames[i]);
         }
     }
 
@@ -265,12 +273,12 @@ public class QaaOp extends PixelOperator {
         targetProduct.getMaskGroup().add(mask);
     }
 
-    private Band addBand(Product targetProduct, String namePattern, int wavelength, String descriptionPattern) {
-        Band band = targetProduct.addBand(String.format(namePattern, wavelength), ProductData.TYPE_FLOAT32);
+    private Band addBand(ProductConfigurer configurer, String namePattern, int wavelength, String descriptionPattern) {
+        String bandName = String.format(namePattern, wavelength);
+        Band band = configurer.addBand(bandName, ProductData.TYPE_FLOAT32, NO_DATA_VALUE);
         band.setDescription(String.format(descriptionPattern, wavelength));
         band.setUnit("1/m");
         band.setNoDataValueUsed(true);
-        band.setNoDataValue(NO_DATA_VALUE);
         return band;
     }
 
