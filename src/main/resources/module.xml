@@ -3,7 +3,7 @@
 
     <symbolicName>beam-meris-qaa</symbolicName>
     <name>QAA IOP Processor</name>
-    <version>1.0.2</version>
+    <version>1.1</version>
 
     <description>
         <![CDATA[
@@ -20,6 +20,9 @@
 
     <changelog>
         <![CDATA[
+        Changes in 1.1:<br/>
+        [QAA-006] Don't test source product for specific type<br/>
+        [QAA-005] Let user specify expression used for detection of invalid pixels<br/>
         Changes in 1.0.2:<br/>
         [QAA-004] Migrate QAA IOP Processor to GPF<br/>
         [QAA-003] Performance can be increased<br/>
@@ -41,7 +44,7 @@
         <module>beam-envisat-reader</module>
     </dependency>
     <dependency>
-        <module>beam-visat</module>
+        <module>beam-visat-rcp</module>
         <optional>true</optional>
     </dependency>
 
@@ -50,16 +53,13 @@
     <extension point="beam-ui:actions">
         <action>
             <id>merisQaaIOP</id>
-            <class>org.esa.beam.visat.actions.DefaultOperatorAction</class>
+            <class>org.esa.beam.meris.qaa.ui.MerisQaaAction</class>
             <text>QAA for IOP (MERIS)...</text>
             <shortDescr>Invoke the QAA for IOP processor</shortDescr>
             <mnemonic>Q</mnemonic>
             <parent>tools</parent>
             <helpId>QAATool</helpId>
             <placeAfter>flhMciScientificTool</placeAfter>
-            <operatorName>Meris.QaaIOP</operatorName>
-            <dialogTitle>QAA for IOP</dialogTitle>
-            <targetProductNameSuffix>_qaa</targetProductNameSuffix>
         </action>
     </extension>
 

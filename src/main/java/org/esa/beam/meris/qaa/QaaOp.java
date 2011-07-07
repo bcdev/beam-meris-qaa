@@ -16,23 +16,24 @@ import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
 import org.esa.beam.framework.gpf.pointop.Sample;
 import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
+import org.esa.beam.jai.ResolutionLevel;
+import org.esa.beam.jai.VirtualBandOpImage;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @OperatorMetadata(alias = "Meris.QaaIOP",
-                  description = "QAA for IOP.",
+                  description = "Performs retrieval of inherent optical properties (IOPs) for " +
+                                "coastal and open ocean waters for MERIS.",
                   authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
                   copyright = "(C) 2009 by NRL and WSU",
-                  version = "1.0.2")
+                  version = "1.1")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
     private static final String FLAG_CODING = "analytical_flags";
     private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
-    private static final String WATER_MASK_NAME = "water";
-    private static final String INVALID_MASK_NAME = "agc_invalid";
-    private static final String MERIS_L2_FLAGS_BAND_NAME = "l2_flags";
 
     private static final int[] A_INDEXES = {0, 1, 2, 3, 4};
     private static final int[] BB_INDEXES = {5, 6, 7, 8, 9};
@@ -62,6 +63,10 @@ public class QaaOp extends PixelOperator {
                    })
     private Product sourceProduct;
 
+    @Parameter(defaultValue = "not l2_flags.WATER",
+               description = "Expression defining pixels not considered for processing")
+    private String invalidPixelExpression;
+
     @Parameter(alias = "aLowerBound", defaultValue = "-0.02", label = "'A' Lower Bound")
     private float a_lower;
     @Parameter(alias = "aUpperBound", defaultValue = "5.0", label = "'A' Upper Bound",
@@ -87,10 +92,15 @@ public class QaaOp extends PixelOperator {
     private boolean divideByPI;
 
     private Qaa qaa;
+    private VirtualBandOpImage invalidOpImage;
 
     @Override
     protected void prepareInputs() throws OperatorException {
         validateSourceProduct();
+        invalidOpImage = VirtualBandOpImage.createMask(invalidPixelExpression,
+                                                       sourceProduct,
+                                                       ResolutionLevel.MAXRES);
+        qaa = new Qaa(NO_DATA_VALUE);
     }
 
     @Override
@@ -145,14 +155,6 @@ public class QaaOp extends PixelOperator {
         for (int i = 0; i < 7; i++) {
             sampleConfigurer.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
-        if (isMerisL2Product()) {
-            sampleConfigurer.defineSample(7, WATER_MASK_NAME);
-        } else {
-            sampleConfigurer.defineSample(7, INVALID_MASK_NAME);
-        }
-
-
-        qaa = new Qaa(NO_DATA_VALUE);
     }
 
     @Override
@@ -165,10 +167,9 @@ public class QaaOp extends PixelOperator {
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
-        final Sample maskSample = sourceSamples[sourceSamples.length - 1];
 
-        if (isSampleWater(maskSample)) { // Check if it is water
-            final float[] rrs = new float[sourceSamples.length - 1];
+        if (isSampleValid(x, y)) { // Check if it is water
+            final float[] rrs = new float[sourceSamples.length];
             for (int i = 0; i < rrs.length; i++) {
                 rrs[i] = sourceSamples[i].getFloat();
                 if (divideByPI) {    //Take care of Pi
@@ -226,26 +227,19 @@ public class QaaOp extends PixelOperator {
         }
     }
 
+
     private void validateSourceProduct() {
-        final Mask invalidMask = sourceProduct.getMaskGroup().get(INVALID_MASK_NAME);
-        if (!isMerisL2Product() && invalidMask == null) {
-            throw new OperatorException(
-                    "Source product must either be MERIS L2 or have been produced by Glint processor.");
+        for (int i = 0; i < 7; i++) {
+            String requiredBandName = EnvisatConstants.MERIS_L2_BAND_NAMES[i];
+            if (!sourceProduct.containsBand(requiredBandName)) {
+                String msg = String.format("Source product must contain a band with the name '%s'", requiredBandName);
+                throw new OperatorException(msg);
+            }
         }
     }
 
-    private boolean isSampleWater(Sample maskSample) {
-        boolean isWater;
-        if (isMerisL2Product()) {
-            isWater = maskSample.getBoolean();
-        } else {
-            isWater = !maskSample.getBoolean();
-        }
-        return isWater;
-    }
-
-    private boolean isMerisL2Product() {
-        return sourceProduct.getBand(MERIS_L2_FLAGS_BAND_NAME) != null;
+    private boolean isSampleValid(int x, int y) {
+        return invalidOpImage.getData(new Rectangle(x, y, 1, 1)).getSample(x, y, 0) == 0;
     }
 
     private float checkAgainstBounds(float value, float lowerBound, float upperBound) {
