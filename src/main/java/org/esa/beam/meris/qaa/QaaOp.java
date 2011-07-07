@@ -97,6 +97,11 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void prepareInputs() throws OperatorException {
         validateSourceProduct();
+        if (!sourceProduct.isCompatibleBandArithmeticExpression(invalidPixelExpression)) {
+            String message = String.format("The given expression '%s' is not compatible with the source product.",
+                                           invalidPixelExpression);
+            throw new OperatorException(message);
+        }
         invalidOpImage = VirtualBandOpImage.createMask(invalidPixelExpression,
                                                        sourceProduct,
                                                        ResolutionLevel.MAXRES);
