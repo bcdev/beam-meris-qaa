@@ -110,6 +110,7 @@ public class QaaOp extends PixelOperator {
 
     @Override
     protected void configureTargetProduct(ProductConfigurer configurer) {
+        super.configureTargetProduct(configurer);
         for (int i = 0; i < A_INDEXES.length; i++) {
             addBand(configurer, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i],
                     "Total absorption coefficient of all water constituents at %d nm.");
@@ -165,8 +166,11 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void configureTargetSamples(SampleConfigurer sampleConfigurer) throws OperatorException {
         final String[] targetBandNames = getTargetProduct().getBandNames();
-        for (int i = 0; i < targetBandNames.length; i++) {
-            sampleConfigurer.defineSample(i, targetBandNames[i]);
+        int sampleIndex = 0;
+        for (final String targetBandName : targetBandNames) {
+            if (!getTargetProduct().getBand(targetBandName).isSourceImageSet()) {
+                sampleConfigurer.defineSample(sampleIndex++, targetBandName);
+            }
         }
     }
 
