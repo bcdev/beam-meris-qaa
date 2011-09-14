@@ -280,7 +280,8 @@ public class QaaOp extends PixelOperator {
         String bandName = String.format(namePattern, wavelength);
         Band band = configurer.addBand(bandName, ProductData.TYPE_FLOAT32, NO_DATA_VALUE);
         band.setDescription(String.format(descriptionPattern, wavelength));
-        band.setUnit("1/m");
+        band.setUnit("m^-1");
+        band.setSpectralWavelength(wavelength);
         band.setNoDataValueUsed(true);
         return band;
     }
