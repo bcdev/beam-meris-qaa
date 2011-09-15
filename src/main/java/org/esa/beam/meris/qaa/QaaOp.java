@@ -67,7 +67,8 @@ public class QaaOp extends PixelOperator {
                description = "Expression defining pixels not considered for processing")
     private String invalidPixelExpression;
 
-    @Parameter(alias = "aLowerBound", defaultValue = "-0.02", label = "'A' Lower Bound")
+    @Parameter(alias = "aLowerBound", defaultValue = "-0.02", label = "'A' Lower Bound",
+               description = "The lower bound of the valid value range.")
     private float a_lower;
     @Parameter(alias = "aUpperBound", defaultValue = "5.0", label = "'A' Upper Bound",
                description = "The upper bound of the valid value range.")
