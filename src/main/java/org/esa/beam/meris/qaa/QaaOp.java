@@ -64,7 +64,7 @@ public class QaaOp extends PixelOperator {
     private Product sourceProduct;
 
     @Parameter(defaultValue = "not l2_flags.WATER",
-               description = "Expression defining pixels not considered for processing")
+               description = "Expression defining pixels not considered for processing.")
     private String invalidPixelExpression;
 
     @Parameter(alias = "aLowerBound", defaultValue = "-0.02", label = "'A' Lower Bound",
