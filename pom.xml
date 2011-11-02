@@ -12,16 +12,21 @@
     </description>
     <packaging>jar</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <beamVersion>4.9</beamVersion>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-gpf</artifactId>
-            <version>4.9</version>
+            <version>${beamVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat-rcp</artifactId>
-            <version>4.9</version>
+            <version>${beamVersion}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -41,13 +46,19 @@
                     <target>1.6</target>
                     <debug>true</debug>
                     <fork>false</fork>
-                    <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>com.bc.maven.plugins</groupId>
                 <artifactId>maven-javahelp-plugin</artifactId>
                 <version>1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javahelp-indexer</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <extensions>
