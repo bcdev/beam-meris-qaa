@@ -6,9 +6,9 @@ Installation
 ============
 
 To install QAA, place the QAA jar file into the modules folder located wherever 
-Beam-Visat was installed. QAA will now be available next time Beam-Visat is started.  
+BEAM was installed. QAA will now be available next time Beam-Visat is started.  
 
-Note: If Beam-Visat is already running, it will have to be restarted before QAA will 
+Note: If BEAM-Visat is already running, it will have to be restarted before QAA will 
 be available for use.
 
 License
