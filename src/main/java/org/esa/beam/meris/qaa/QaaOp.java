@@ -27,7 +27,7 @@ import java.awt.Rectangle;
                   description = "Performs retrieval of inherent optical properties (IOPs) for " +
                                 "coastal and open ocean waters for MERIS.",
                   authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
-                  copyright = "(C) 2009 by NRL and WSU",
+                  copyright = "(C) 2011 by NRL and WSU",
                   version = "1.1")
 public class QaaOp extends PixelOperator {
 
