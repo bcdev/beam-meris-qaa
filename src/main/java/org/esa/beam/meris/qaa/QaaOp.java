@@ -113,20 +113,20 @@ public class QaaOp extends PixelOperator {
     protected void configureTargetProduct(ProductConfigurer configurer) {
         super.configureTargetProduct(configurer);
         for (int i = 0; i < A_INDEXES.length; i++) {
-            addBand(configurer, A_TOTAL_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, A_TOTAL_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Total absorption coefficient of all water constituents at %d nm.");
         }
         for (int i = 0; i < BB_INDEXES.length; i++) {
-            addBand(configurer, BB_SPM_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, BB_SPM_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Backscattering of suspended particulate matter at %d nm.");
         }
 
         for (int i = 0; i < APH_INDEXES.length; i++) {
-            addBand(configurer, A_PIG_PATTERN, Qaa.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
+            addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
         }
 
         for (int i = 0; i < ADG_INDEXES.length; i++) {
-            addBand(configurer, A_YS_PATTERN, Qaa.WAVELENGTH[i],
+            addBand(configurer, A_YS_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Yellow substance absorption coefficient at %d nm.");
         }
 
@@ -206,12 +206,12 @@ public class QaaOp extends PixelOperator {
                 targetSamples[FLAG_INDEX].set((int) FLAG_VALID);
 
                 for (int i = 0; i < A_INDEXES.length; i++) {
-                    float a = (float) Qaa.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
+                    float a = (float) QaaConstants.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
                     a = checkAgainstBounds(a, a_lower, a_upper);
                     targetSamples[A_INDEXES[i]].set(a);
                 }
                 for (int i = 0; i < BB_INDEXES.length; i++) {
-                    float bb = (float) Qaa.BBW_COEFS[i] + bbp_pixel[i];
+                    float bb = (float) QaaConstants.BBW_COEFS[i] + bbp_pixel[i];
                     bb = checkAgainstBounds(bb, bb_lower, bb_upper);
                     targetSamples[BB_INDEXES[i]].set(bb);
                 }
