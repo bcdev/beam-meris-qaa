@@ -21,6 +21,9 @@
     <changelog>
         <![CDATA[
         Changes in 1.1:<br/>
+        [QAA-009] Rename IOPs in user interface according to the resulting band names<br/>
+        [QAA-008] Introduce flags to indicate values which are out of bounds<br/>
+        [QAA-007] Change no-data value to Float.NaN<br/>
         [QAA-006] Don't test source product for specific type<br/>
         [QAA-005] Let user specify expression used for detection of invalid pixels<br/>
         Changes in 1.0.2:<br/>
