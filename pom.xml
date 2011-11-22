@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.esa.beam</groupId>
     <artifactId>beam-meris-qaa</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
 
     <name>QAA IOP Processor</name>
     <description>Retrieval of inherent optical properties (IOPs) for coastal and open ocean waters for MERIS
