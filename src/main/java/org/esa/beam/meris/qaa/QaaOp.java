@@ -137,7 +137,8 @@ public class QaaOp extends PixelOperator {
         }
 
         for (int i = 0; i < A_PIG_BAND_INDEXES.length; i++) {
-            addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i], "Pigment absorption coefficient at %d nm.");
+            addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i],
+                    "Pigment absorption coefficient at %d nm.");
         }
 
         for (int i = 0; i < A_YS_BAND_INDEXES.length; i++) {
