@@ -59,7 +59,7 @@ public class QaaOp extends PixelOperator {
     private static final int FLAG_INDEX_BB_SPM_OOB = 5;
     private static final int FLAG_INDEX_A_TOTAL_OOB = 4;
     private static final int FLAG_INDEX_INVALID = 3;
-    private static final int FLAG_INDEX_NEGATIVE_ADG = 2;
+    private static final int FLAG_INDEX_NEGATIVE_AYS = 2;
     private static final int FLAG_INDEX_IMAGINARY = 1;
     private static final int FLAG_INDEX_VALID = 0;
 
@@ -155,26 +155,26 @@ public class QaaOp extends PixelOperator {
         //noinspection PointlessBitwiseExpression
         addFlagAndMask(targetProduct, flagCoding, "normal", "A valid water pixel.",
                        1 << FLAG_INDEX_VALID, Color.BLUE);
-        addFlagAndMask(targetProduct, flagCoding, "Imaginary_number",
+        addFlagAndMask(targetProduct, flagCoding, "imaginary_number",
                        "Classified as water, but an imaginary number would have been produced.",
                        1 << FLAG_INDEX_IMAGINARY, Color.RED);
-        addFlagAndMask(targetProduct, flagCoding, "Negative_Adg",
-                       "Classified as water, but one or more of the bands contain a negative Adg value.",
-                       1 << FLAG_INDEX_NEGATIVE_ADG, Color.YELLOW);
+        addFlagAndMask(targetProduct, flagCoding, "negative_a_ys",
+                       "Classified as water, but one or more of the bands contain a negative a_ys value.",
+                       1 << FLAG_INDEX_NEGATIVE_AYS, Color.YELLOW);
         addFlagAndMask(targetProduct, flagCoding, "non_water",
                        "Not classified as a water pixel (land/cloud).",
                        1 << FLAG_INDEX_INVALID, Color.BLACK);
         addFlagAndMask(targetProduct, flagCoding, "a_total_oob",
-                       "At least one value of the a spectrum is out of bounds.",
+                       "At least one value of the a_total spectrum is out of bounds.",
                        1 << FLAG_INDEX_A_TOTAL_OOB, Color.CYAN);
         addFlagAndMask(targetProduct, flagCoding, "bb_spm_oob",
-                       "At least one value of the bb spectrum is out of bounds.",
+                       "At least one value of the bb_spm spectrum is out of bounds.",
                        1 << FLAG_INDEX_BB_SPM_OOB, Color.MAGENTA);
         addFlagAndMask(targetProduct, flagCoding, "a_pig_oob",
-                       "At least one value of the aph spectrum is out of bounds.",
+                       "At least one value of the a_pig spectrum is out of bounds.",
                        1 << FLAG_INDEX_A_PIG_OOB, Color.ORANGE);
         addFlagAndMask(targetProduct, flagCoding, "a_ys_oob",
-                       "At least one value of the adg spectrum is out of bounds.",
+                       "At least one value of the a_ys spectrum is out of bounds.",
                        1 << FLAG_INDEX_A_YS_OOB, Color.PINK);
 
         Band analyticalFlagBand = new Band(ANALYSIS_FLAG_BAND_NAME, ProductData.TYPE_UINT8, sceneWidth, sceneHeight);
@@ -247,37 +247,39 @@ public class QaaOp extends PixelOperator {
         }
     }
 
-    private void computeAYs(WritableSample[] targetSamples, float[] adg_pixel) {
+    private void computeAYs(WritableSample[] targetSamples, float[] ays_pixel) {
         for (int i = 0; i < A_YS_BAND_INDEXES.length; i++) {
-            float adg = adg_pixel[i];
-            boolean isOob = isOutOfBounds(adg, 0.0f, aYsUpper);
-            if (isOob && adg < 0) {
-                targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_NEGATIVE_ADG, true);
+            float ays = ays_pixel[i];
+            boolean isOob = isOutOfBounds(ays, 0.0f, aYsUpper);
+            if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_A_YS_OOB, true);
+                if (ays < 0) {
+                    targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_NEGATIVE_AYS, true);
+                }
             }
-            targetSamples[A_YS_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : adg);
+            targetSamples[A_YS_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : ays);
         }
     }
 
-    private void computeAPig(WritableSample[] targetSamples, float[] aph_pixel) {
+    private void computeAPig(WritableSample[] targetSamples, float[] aPig_pixel) {
         for (int i = 0; i < A_PIG_BAND_INDEXES.length; i++) {
-            float aph = aph_pixel[i];
-            boolean isOob = isOutOfBounds(aph, aPigLower, aPigUpper);
+            float aPig = aPig_pixel[i];
+            boolean isOob = isOutOfBounds(aPig, aPigLower, aPigUpper);
             if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_A_PIG_OOB, true);
             }
-            targetSamples[A_PIG_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : aph);
+            targetSamples[A_PIG_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : aPig);
         }
     }
 
-    private void computeBbSpm(WritableSample[] targetSamples, float[] bbp_pixel) {
+    private void computeBbSpm(WritableSample[] targetSamples, float[] bbSpm_pixel) {
         for (int i = 0; i < BB_SPM_BAND_INDEXES.length; i++) {
-            float bb = (float) QaaConstants.BBW_COEFS[i] + bbp_pixel[i];
-            boolean isOob = isOutOfBounds(bb, bbSpmLower, bbSpmUpper);
+            float bbSpm = (float) QaaConstants.BBW_COEFS[i] + bbSpm_pixel[i];
+            boolean isOob = isOutOfBounds(bbSpm, bbSpmLower, bbSpmUpper);
             if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_BB_SPM_OOB, true);
             }
-            targetSamples[BB_SPM_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : bb);
+            targetSamples[BB_SPM_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : bbSpm);
         }
     }
 
