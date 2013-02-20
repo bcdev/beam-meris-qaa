@@ -15,6 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <beamVersion>4.9</beamVersion>
+        <beam.version>5.0-SNAPSHOT</beam.version>
     </properties>
 
     <dependencies>
@@ -22,6 +23,11 @@
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-gpf</artifactId>
             <version>${beamVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.esa.beam</groupId>
+            <artifactId>beam-binning2</artifactId>
+            <version>0.8.1.${beam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
