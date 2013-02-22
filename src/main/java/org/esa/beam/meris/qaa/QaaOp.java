@@ -42,10 +42,6 @@ public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
 
-    private static final int[] A_TOTAL_BAND_INDEXES = {0, 1, 2, 3, 4};
-    private static final int[] BB_SPM_BAND_INDEXES = {5, 6, 7, 8, 9};
-    private static final int[] A_PIG_BAND_INDEXES = {10, 11, 12};
-    private static final int[] A_YS_BAND_INDEXES = {13, 14, 15};
     private static final int FLAG_BAND_INDEX = 16;
     private static final String A_TOTAL_PATTERN = "a_total_%d";
     private static final String BB_SPM_PATTERN = "bb_spm_%d";
@@ -127,21 +123,21 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void configureTargetProduct(ProductConfigurer configurer) {
         super.configureTargetProduct(configurer);
-        for (int i = 0; i < A_TOTAL_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
             addBand(configurer, A_TOTAL_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Total absorption coefficient of all water constituents at %d nm.");
         }
-        for (int i = 0; i < BB_SPM_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.BB_SPM_BAND_INDEXES.length; i++) {
             addBand(configurer, BB_SPM_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Backscattering of suspended particulate matter at %d nm.");
         }
 
-        for (int i = 0; i < A_PIG_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_PIG_BAND_INDEXES.length; i++) {
             addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Pigment absorption coefficient at %d nm.");
         }
 
-        for (int i = 0; i < A_YS_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_YS_BAND_INDEXES.length; i++) {
             addBand(configurer, A_YS_PATTERN, QaaConstants.WAVELENGTH[i],
                     "Yellow substance absorption coefficient at %d nm.");
         }
@@ -249,7 +245,7 @@ public class QaaOp extends PixelOperator {
     }
 
     private void computeAYs(WritableSample[] targetSamples, float[] ays_pixel) {
-        for (int i = 0; i < A_YS_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_YS_BAND_INDEXES.length; i++) {
             float ays = ays_pixel[i];
             boolean isOob = isOutOfBounds(ays, 0.0f, aYsUpper);
             if (isOob) {
@@ -258,40 +254,40 @@ public class QaaOp extends PixelOperator {
                     targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_NEGATIVE_AYS, true);
                 }
             }
-            targetSamples[A_YS_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : ays);
+            targetSamples[QaaConstants.A_YS_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : ays);
         }
     }
 
     private void computeAPig(WritableSample[] targetSamples, float[] aPig_pixel) {
-        for (int i = 0; i < A_PIG_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_PIG_BAND_INDEXES.length; i++) {
             float aPig = aPig_pixel[i];
             boolean isOob = isOutOfBounds(aPig, aPigLower, aPigUpper);
             if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_A_PIG_OOB, true);
             }
-            targetSamples[A_PIG_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : aPig);
+            targetSamples[QaaConstants.A_PIG_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : aPig);
         }
     }
 
     private void computeBbSpm(WritableSample[] targetSamples, float[] bbSpm_pixel) {
-        for (int i = 0; i < BB_SPM_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.BB_SPM_BAND_INDEXES.length; i++) {
             float bbSpm = (float) QaaConstants.BBW_COEFS[i] + bbSpm_pixel[i];
             boolean isOob = isOutOfBounds(bbSpm, bbSpmLower, bbSpmUpper);
             if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_BB_SPM_OOB, true);
             }
-            targetSamples[BB_SPM_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : bbSpm);
+            targetSamples[QaaConstants.BB_SPM_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : bbSpm);
         }
     }
 
     private void computeATotal(WritableSample[] targetSamples, float[] aph_pixel, float[] adg_pixel) {
-        for (int i = 0; i < A_TOTAL_BAND_INDEXES.length; i++) {
+        for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
             float a = (float) QaaConstants.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
             boolean isOob = isOutOfBounds(a, aTotalLower, aTotalUpper);
             if (isOob) {
                 targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_A_TOTAL_OOB, true);
             }
-            targetSamples[A_TOTAL_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : a);
+            targetSamples[QaaConstants.A_TOTAL_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : a);
         }
     }
 
