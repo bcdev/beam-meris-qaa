@@ -3,7 +3,7 @@ package org.esa.beam.meris.qaa;
 public class QaaResult {
 
     private static final int FLAG_MASK_VALID = 0x0001;
-    private static final int FLAG_MASK_NEGATIVE_AYS= 0x0004;
+    private static final int FLAG_MASK_NEGATIVE_AYS = 0x0004;
     private static final int FLAG_MASK_A_TOTAL_OOB = 0x0010;
     private static final int FLAG_MASK_BB_SPM_OOB = 0x0020;
     private static final int FLAG_MASK_A_PIG_OOB = 0x0040;
@@ -60,7 +60,7 @@ public class QaaResult {
     public void setValid(boolean valid) {
         if (valid) {
             flags |= FLAG_MASK_VALID;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_VALID;
         }
     }
@@ -68,7 +68,7 @@ public class QaaResult {
     public void setATotalOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
             flags |= FLAG_MASK_A_TOTAL_OOB;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_A_TOTAL_OOB;
         }
     }
@@ -76,7 +76,7 @@ public class QaaResult {
     public void setBbSpmOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
             flags |= FLAG_MASK_BB_SPM_OOB;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_BB_SPM_OOB;
         }
     }
@@ -84,7 +84,7 @@ public class QaaResult {
     public void setAPigOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
             flags |= FLAG_MASK_A_PIG_OOB;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_A_PIG_OOB;
         }
     }
@@ -96,7 +96,7 @@ public class QaaResult {
     public void setAYsOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
             flags |= FLAG_MASK_A_YS_OOB;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_A_YS_OOB;
         }
     }
@@ -104,8 +104,41 @@ public class QaaResult {
     public void setAYsNegative(boolean isNegative) {
         if (isNegative) {
             flags |= FLAG_MASK_NEGATIVE_AYS;
-        }  else {
+        } else {
             flags &= ~FLAG_MASK_NEGATIVE_AYS;
+        }
+    }
+
+    public void invalidate() {
+        setMeasurementsTo(QaaConstants.NO_DATA_VALUE);
+        clearFlags();
+    }
+
+    public void reset() {
+        clearFlags();
+        setValid(true);
+        setMeasurementsTo(0.f);
+    }
+
+    private void clearFlags() {
+        flags = 0;
+    }
+
+    private void setMeasurementsTo(float value) {
+        for (int i = 0; i < A_PIG.length; i++) {
+            A_PIG[i] = value;
+        }
+
+        for (int i = 0; i < A_Total.length; i++) {
+            A_Total[i] = value;
+        }
+
+        for (int i = 0; i < A_YS.length; i++) {
+            A_YS[i] = value;
+        }
+
+        for (int i = 0; i < BB_SPM.length; i++) {
+            BB_SPM[i] = value;
         }
     }
 }

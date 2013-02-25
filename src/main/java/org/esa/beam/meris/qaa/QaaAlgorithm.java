@@ -3,15 +3,13 @@ package org.esa.beam.meris.qaa;
 public class QaaAlgorithm {
 
     private static final double ONE_DIV_PI = 1.0 / Math.PI;
-    // @todo tb/tb 4 make configurable?? 2013-02-22
-    private static final float NO_DATA_VALUE = Float.NaN;
 
     private QaaConfig config;
     private final Qaa qaa;
 
 
     public QaaAlgorithm() {
-        qaa = new Qaa(NO_DATA_VALUE);
+        qaa = new Qaa(QaaConstants.NO_DATA_VALUE);
         config = new QaaConfig();
     }
 
@@ -36,41 +34,46 @@ public class QaaAlgorithm {
      *               rrs_in[6] @ 665   nm
      * @return the computation result
      */
-    public QaaResult process(float[] rrs_in, QaaResult recycle) throws ImaginaryNumberException {
+    public QaaResult process(float[] rrs_in, QaaResult recycle) {
         QaaResult result = ensureResult(recycle);
 
-        final float[] rrs = new float[rrs_in.length];
-        for (int i = 0; i < rrs.length; i++) {
-            rrs[i] = rrs_in[i];
-            if (config.isDivideByPi()) {
-                rrs[i] *= ONE_DIV_PI;
+        try {
+            final float[] rrs = new float[rrs_in.length];
+            final boolean divideByPi = config.isDivideByPi();
+            for (int i = 0; i < rrs.length; i++) {
+                rrs[i] = rrs_in[i];
+                if (divideByPi) {
+                    rrs[i] *= ONE_DIV_PI;
+                }
             }
+
+            // @todo 3 tb/tb convert these to fields? 2013-02-22
+            final float[] rrs_pixel = new float[7];
+            final float[] a_pixel = new float[6];
+            final float[] bbSpm_pixel = new float[6];
+            final float[] aPig_pixel = new float[6];
+            final float[] aYs_pixel = new float[6];
+
+            /**
+             * QAA v5 processing
+             */
+            // steps 0-6
+            // The length of pixel is 7 bands, rrs_pixel... are 6 bands
+            qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel);
+
+            // steps 7-10
+            qaa.qaaf_decomp(rrs_pixel, a_pixel, aPig_pixel, aYs_pixel);
+
+            // if we came here without exception the data is valid
+            result.setValid(true);
+
+            result = computeATotal(aPig_pixel, aYs_pixel, result);
+            result = computeBbSpm(bbSpm_pixel, result);
+            result = computeAPig(aPig_pixel, result);
+            result = computeAYs(aYs_pixel, result);
+        } catch (ImaginaryNumberException e) {
+            result.invalidate();
         }
-
-        // @todo 3 tb/tb convert these to fields? 2013-02-22
-        final float[] rrs_pixel = new float[7];
-        final float[] a_pixel = new float[6];
-        final float[] bbSpm_pixel = new float[6];
-        final float[] aPig_pixel = new float[6];
-        final float[] aYs_pixel = new float[6];
-
-        /**
-         * QAA v5 processing
-         */
-        // steps 0-6
-        // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-        qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel);
-
-        // steps 7-10
-        qaa.qaaf_decomp(rrs_pixel, a_pixel, aPig_pixel, aYs_pixel);
-
-        // if we came here without exception the data is valid
-        result.setValid(true);
-
-        result = computeATotal(aPig_pixel, aYs_pixel, result);
-        result = computeBbSpm(bbSpm_pixel, result);
-        result = computeAPig(aPig_pixel, result);
-        result = computeAYs(aYs_pixel, result);
 
         return result;
     }
@@ -90,7 +93,7 @@ public class QaaAlgorithm {
             if (isOob) {
                 // @todo 2 tb/tb case not covered by tests tb 2013-02-25
                 qaaResult.setATotalOutOfBounds(true);
-                qaaResult.setA_Total(NO_DATA_VALUE, i);
+                qaaResult.setA_Total(QaaConstants.NO_DATA_VALUE, i);
             } else {
                 qaaResult.setA_Total(a, i);
             }
@@ -106,7 +109,7 @@ public class QaaAlgorithm {
             if (isOob) {
                 // @todo 2 tb/tb case not covered by tests tb 2013-02-25
                 qaaResult.setBbSpmOutOfBounds(true);
-                qaaResult.setBB_SPM(NO_DATA_VALUE, i);
+                qaaResult.setBB_SPM(QaaConstants.NO_DATA_VALUE, i);
             } else {
                 qaaResult.setBB_SPM(bbSpm, i);
             }
@@ -121,7 +124,7 @@ public class QaaAlgorithm {
             if (isOob) {
                 // @todo 2 tb/tb case not covered by tests tb 2013-02-25
                 qaaResult.setAPigOutOfBounds(true);
-                qaaResult.setA_PIG(NO_DATA_VALUE, i);
+                qaaResult.setA_PIG(QaaConstants.NO_DATA_VALUE, i);
             } else {
                 qaaResult.setA_PIG(aPig, i);
             }
@@ -140,7 +143,7 @@ public class QaaAlgorithm {
                     // @todo 2 tb/tb case not covered by tests tb 2013-02-25
                     qaaResult.setAYsNegative(true);
                 }
-                qaaResult.setA_YS(NO_DATA_VALUE, i);
+                qaaResult.setA_YS(QaaConstants.NO_DATA_VALUE, i);
             } else {
                 qaaResult.setA_YS(ays, i);
             }

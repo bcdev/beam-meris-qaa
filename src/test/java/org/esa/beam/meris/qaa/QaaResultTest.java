@@ -136,4 +136,73 @@ public class QaaResultTest {
         result.setAYsNegative(false);
         assertEquals(0, result.getFlags());
     }
+
+    @Test
+    public void testInvalidate() {
+        result.invalidate();
+
+        final float[] a_pig = result.getA_PIG();
+        assertEquals(QaaConstants.NUM_A_PIG_BANDS, a_pig.length);
+        for (float anA_pig : a_pig) {
+            assertEquals(QaaConstants.NO_DATA_VALUE, anA_pig, 1e-8);
+        }
+
+        final float[] a_total = result.getA_Total();
+        assertEquals(QaaConstants.NUM_A_TOTAL_BANDS, a_total.length);
+        for (float anA_total : a_total) {
+            assertEquals(QaaConstants.NO_DATA_VALUE, anA_total, 1e-8);
+        }
+
+        final float[] a_ys = result.getA_YS();
+        assertEquals(QaaConstants.NUM_A_YS_BANDS, a_ys.length);
+        for (float a_y : a_ys) {
+            assertEquals(QaaConstants.NO_DATA_VALUE, a_y, 1e-8);
+        }
+
+        final float[] bb_spm = result.getBB_SPM();
+        assertEquals(QaaConstants.NUM_BB_SPM_BANDS, bb_spm.length);
+        for (float aBb_spm : bb_spm) {
+            assertEquals(QaaConstants.NO_DATA_VALUE, aBb_spm, 1e-8);
+        }
+
+        final int flags = result.getFlags();
+        assertEquals(0, flags);
+    }
+
+    @Test
+    public void testReset() {
+        result.setATotalOutOfBounds(true);
+        result.setBbSpmOutOfBounds(true);
+        for (int i = 0; i < 3; i++) {
+            result.setA_YS(i + 1, i);
+        }
+        for (int i = 0; i < 3; i++) {
+            result.setA_PIG(i + 3, i);
+        }
+        for (int i = 0; i < 5; i++) {
+            result.setA_Total(i + 7, i);
+        }
+        for (int i = 0; i < 5; i++) {
+            result.setBB_SPM(i + 12, i);
+        }
+
+        result.reset();
+        assertEquals(1, result.getFlags());
+        final float[] a_pig = result.getA_PIG();
+        for (float anA_pig : a_pig) {
+            assertEquals(0.f, anA_pig, 1e-8);
+        }
+        final float[] a_total = result.getA_Total();
+        for (float anA_total : a_total) {
+            assertEquals(0.f, anA_total, 1e-8);
+        }
+        final float[] a_ys = result.getA_YS();
+        for (float a_y : a_ys) {
+            assertEquals(0.f, a_y, 1e-8);
+        }
+        final float[] bb_spm = result.getBB_SPM();
+        for (float aBb_spm : bb_spm) {
+            assertEquals(0.f, aBb_spm, 1e-8);
+        }
+    }
 }

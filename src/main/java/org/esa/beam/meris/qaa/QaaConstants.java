@@ -36,6 +36,8 @@ final class QaaConstants {
     static final int[] A_YS_BAND_INDEXES = {13, 14, 15};
     static final float A_YS_LOWER_DEFAULT = 0.f;
     static final float A_YS_UPPER_DEFAULT = 1.f;
+    // @todo tb/tb 4 make configurable?? 2013-02-22
+    static final float NO_DATA_VALUE = Float.NaN;
 
     private QaaConstants() {
     }
