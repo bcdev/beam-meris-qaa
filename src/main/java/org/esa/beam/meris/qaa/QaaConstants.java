@@ -19,18 +19,23 @@ final class QaaConstants {
 
     static final int NUM_A_TOTAL_BANDS = 5;
     static final int[] A_TOTAL_BAND_INDEXES = {0, 1, 2, 3, 4};
+    static final float A_TOTAL_LOWER_DEFAULT = -0.02f;
+    static final float A_TOTAL_UPPER_DEFAULT = 5.f;
 
     static final int NUM_BB_SPM_BANDS = 5;
     static final int[] BB_SPM_BAND_INDEXES = {5, 6, 7, 8, 9};
+    static final float BB_SPM_LOWER_DEFAULT = -0.02f;
+    static final float BB_SPM_UPPER_DEFAULT = 5.f;
 
     static final int NUM_A_PIG_BANDS = 3;
     static final int[] A_PIG_BAND_INDEXES = {10, 11, 12};
+    static final float A_PIG_LOWER_DEFAULT = -0.02f;
+    static final float A_PIG_UPPER_DEFAULT = 3.f;
 
     static final int NUM_A_YS_BANDS = 3;
     static final int[] A_YS_BAND_INDEXES = {13, 14, 15};
-
-    static final float A_TOTAL_LOWER = -0.02f;
-    static final float A_TOTAL_UPPER = 5.f;
+    static final float A_YS_LOWER_DEFAULT = 0.f;
+    static final float A_YS_UPPER_DEFAULT = 1.f;
 
     private QaaConstants() {
     }

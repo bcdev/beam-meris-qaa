@@ -32,6 +32,8 @@ public class QaaResultTest {
         final float[] a_ys = result.getA_YS();
         assertNotNull(a_ys);
         assertEquals(QaaConstants.NUM_A_YS_BANDS, a_ys.length);
+
+        assertEquals(1, result.getFlags());
     }
 
     @Test
@@ -77,6 +79,61 @@ public class QaaResultTest {
         assertEquals(1, result.getFlags());
 
         result.setValid(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
+    public void testSetATotalOutOfBounds() {
+        result.setValid(false); // remove the valid flag
+
+        result.setATotalOutOfBounds(true);
+        assertEquals(16, result.getFlags());
+
+        result.setATotalOutOfBounds(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
+    public void testSetBbSpmOutOfBounds() {
+        result.setValid(false); // remove the valid flag
+
+        result.setBbSpmOutOfBounds(true);
+        assertEquals(32, result.getFlags());
+
+        result.setBbSpmOutOfBounds(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
+    public void testSetAPigOutOfBounds() {
+        result.setValid(false); // remove the valid flag
+
+        result.setAPigOutOfBounds(true);
+        assertEquals(64, result.getFlags());
+
+        result.setAPigOutOfBounds(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
+    public void testSetAYsOutOfBounds() {
+        result.setValid(false); // remove the valid flag
+
+        result.setAYsOutOfBounds(true);
+        assertEquals(128, result.getFlags());
+
+        result.setAYsOutOfBounds(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
+    public void testSetAYsNegative() {
+        result.setValid(false); // remove the valid flag
+
+        result.setAYsNegative(true);
+        assertEquals(4, result.getFlags());
+
+        result.setAYsNegative(false);
         assertEquals(0, result.getFlags());
     }
 }

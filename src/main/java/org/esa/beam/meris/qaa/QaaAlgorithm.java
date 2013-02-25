@@ -37,7 +37,7 @@ public class QaaAlgorithm {
      * @return the computation result
      */
     public QaaResult process(float[] rrs_in, QaaResult recycle) throws ImaginaryNumberException {
-        final QaaResult result = ensureResult(recycle);
+        QaaResult result = ensureResult(recycle);
 
         final float[] rrs = new float[rrs_in.length];
         for (int i = 0; i < rrs.length; i++) {
@@ -67,6 +67,10 @@ public class QaaAlgorithm {
         // if we came here without exception the data is valid
         result.setValid(true);
 
+        result = computeATotal(aPig_pixel, aYs_pixel, result);
+        result = computeBbSpm(bbSpm_pixel, result);
+        result = computeAPig(aPig_pixel, result);
+        result = computeAYs(aYs_pixel, result);
 
         return result;
     }
@@ -83,13 +87,64 @@ public class QaaAlgorithm {
         for (int i = 0; i < QaaConstants.NUM_A_TOTAL_BANDS; i++) {
             float a = (float) QaaConstants.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
             boolean isOob = isOutOfBounds(a, config.getATotalLower(), config.getATotalUpper());
-            // @todo 1 tb/tb continue here
-//            if (isOob) {
-//                targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_A_TOTAL_OOB, true);
-//            }
-//            targetSamples[A_TOTAL_BAND_INDEXES[i]].set(isOob ? NO_DATA_VALUE : a);
+            if (isOob) {
+                // @todo 2 tb/tb case not covered by tests tb 2013-02-25
+                qaaResult.setATotalOutOfBounds(true);
+                qaaResult.setA_Total(NO_DATA_VALUE, i);
+            } else {
+                qaaResult.setA_Total(a, i);
+            }
         }
 
+        return qaaResult;
+    }
+
+    private QaaResult computeBbSpm(float[] bbSpm_pixel, QaaResult qaaResult) {
+        for (int i = 0; i < QaaConstants.NUM_BB_SPM_BANDS; i++) {
+            float bbSpm = (float) QaaConstants.BBW_COEFS[i] + bbSpm_pixel[i];
+            boolean isOob = isOutOfBounds(bbSpm, config.getBbSpmsLower(), config.getBbSpmsUpper());
+            if (isOob) {
+                // @todo 2 tb/tb case not covered by tests tb 2013-02-25
+                qaaResult.setBbSpmOutOfBounds(true);
+                qaaResult.setBB_SPM(NO_DATA_VALUE, i);
+            } else {
+                qaaResult.setBB_SPM(bbSpm, i);
+            }
+        }
+        return qaaResult;
+    }
+
+    private QaaResult computeAPig(float[] aPig_pixel, QaaResult qaaResult) {
+        for (int i = 0; i < QaaConstants.NUM_A_PIG_BANDS; i++) {
+            float aPig = aPig_pixel[i];
+            boolean isOob = isOutOfBounds(aPig, config.getAPigLower(), config.getAPigUpper());
+            if (isOob) {
+                // @todo 2 tb/tb case not covered by tests tb 2013-02-25
+                qaaResult.setAPigOutOfBounds(true);
+                qaaResult.setA_PIG(NO_DATA_VALUE, i);
+            } else {
+                qaaResult.setA_PIG(aPig, i);
+            }
+        }
+        return qaaResult;
+    }
+
+    private QaaResult computeAYs(float[] ays_pixel, QaaResult qaaResult) {
+        for (int i = 0; i < QaaConstants.NUM_A_YS_BANDS; i++) {
+            float ays = ays_pixel[i];
+            boolean isOob = isOutOfBounds(ays, config.getAYsLower(), config.getAYsUpper());
+            if (isOob) {
+                // @todo 2 tb/tb case not covered by tests tb 2013-02-25
+                qaaResult.setAYsOutOfBounds(true);
+                if (ays < 0) {
+                    // @todo 2 tb/tb case not covered by tests tb 2013-02-25
+                    qaaResult.setAYsNegative(true);
+                }
+                qaaResult.setA_YS(NO_DATA_VALUE, i);
+            } else {
+                qaaResult.setA_YS(ays, i);
+            }
+        }
         return qaaResult;
     }
 

@@ -2,7 +2,12 @@ package org.esa.beam.meris.qaa;
 
 public class QaaResult {
 
-    private static final int FLAG_INDEX_VALID = 0;
+    private static final int FLAG_MASK_VALID = 0x0001;
+    private static final int FLAG_MASK_NEGATIVE_AYS= 0x0004;
+    private static final int FLAG_MASK_A_TOTAL_OOB = 0x0010;
+    private static final int FLAG_MASK_BB_SPM_OOB = 0x0020;
+    private static final int FLAG_MASK_A_PIG_OOB = 0x0040;
+    private static final int FLAG_MASK_A_YS_OOB = 0x0080;
 
     private float[] A_Total;
     private float[] BB_SPM;
@@ -15,6 +20,8 @@ public class QaaResult {
         BB_SPM = new float[QaaConstants.NUM_BB_SPM_BANDS];
         A_PIG = new float[QaaConstants.NUM_A_PIG_BANDS];
         A_YS = new float[QaaConstants.NUM_A_YS_BANDS];
+
+        setValid(true);
     }
 
     public void setA_Total(float a_total, int bandIndex) {
@@ -51,10 +58,54 @@ public class QaaResult {
 
     @SuppressWarnings("PointlessBitwiseExpression")
     public void setValid(boolean valid) {
-        flags = valid ? (flags | (1 << FLAG_INDEX_VALID)) : (flags & ~(1 << FLAG_INDEX_VALID));
+        if (valid) {
+            flags |= FLAG_MASK_VALID;
+        }  else {
+            flags &= ~FLAG_MASK_VALID;
+        }
+    }
+
+    public void setATotalOutOfBounds(boolean outOfBounds) {
+        if (outOfBounds) {
+            flags |= FLAG_MASK_A_TOTAL_OOB;
+        }  else {
+            flags &= ~FLAG_MASK_A_TOTAL_OOB;
+        }
+    }
+
+    public void setBbSpmOutOfBounds(boolean outOfBounds) {
+        if (outOfBounds) {
+            flags |= FLAG_MASK_BB_SPM_OOB;
+        }  else {
+            flags &= ~FLAG_MASK_BB_SPM_OOB;
+        }
+    }
+
+    public void setAPigOutOfBounds(boolean outOfBounds) {
+        if (outOfBounds) {
+            flags |= FLAG_MASK_A_PIG_OOB;
+        }  else {
+            flags &= ~FLAG_MASK_A_PIG_OOB;
+        }
     }
 
     public int getFlags() {
         return flags;
+    }
+
+    public void setAYsOutOfBounds(boolean outOfBounds) {
+        if (outOfBounds) {
+            flags |= FLAG_MASK_A_YS_OOB;
+        }  else {
+            flags &= ~FLAG_MASK_A_YS_OOB;
+        }
+    }
+
+    public void setAYsNegative(boolean isNegative) {
+        if (isNegative) {
+            flags |= FLAG_MASK_NEGATIVE_AYS;
+        }  else {
+            flags &= ~FLAG_MASK_NEGATIVE_AYS;
+        }
     }
 }

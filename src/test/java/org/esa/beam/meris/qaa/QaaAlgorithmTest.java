@@ -22,6 +22,35 @@ public class QaaAlgorithmTest {
 
         final int flags = result.getFlags();
         assertEquals(1, flags);
+
+        final float[] a_total = result.getA_Total();
+        assertEquals(QaaConstants.NUM_A_TOTAL_BANDS, a_total.length);
+        assertEquals(0.03845500573515892f, a_total[0], 1e-8);
+        assertEquals(0.030030209571123123f, a_total[1], 1e-8);
+        assertEquals(0.030713409185409546f, a_total[2], 1e-8);
+        assertEquals(0.046738818287849426f, a_total[3], 1e-8);
+        assertEquals(0.06614950299263f, a_total[4], 1e-8);
+
+        final float[] bb_spm = result.getBB_SPM();
+        assertEquals(QaaConstants.NUM_BB_SPM_BANDS, bb_spm.length);
+        assertEquals(0.007518719881772995f, bb_spm[0], 1e-8);
+        assertEquals(0.006027825176715851f, bb_spm[1], 1e-8);
+        assertEquals(0.004540313966572285f, bb_spm[2], 1e-8);
+        assertEquals(0.0040666270069777966f, bb_spm[3], 1e-8);
+        assertEquals(0.0032066269777715206f, bb_spm[4], 1e-8);
+
+        final float[] a_pig = result.getA_PIG();
+        assertEquals(QaaConstants.NUM_A_PIG_BANDS, a_pig.length);
+        assertEquals(0.0028468116652220488f, a_pig[0], 1e-8);
+        assertEquals(0.0036492901854217052f, a_pig[1], 1e-8);
+        assertEquals(0.006425064522773027f, a_pig[2], 1e-8);
+
+        final float[] a_ys = result.getA_YS();
+        assertEquals(QaaConstants.NUM_A_YS_BANDS, a_ys.length);
+        assertEquals(0.030918193981051445f, a_ys[0], 1e-8);
+        assertEquals(0.019170919433236122f, a_ys[1], 1e-8);
+        assertEquals(0.009288343600928783f, a_ys[2], 1e-8);
+
     }
 
     // @todo 3 tb/tb test divide by PI 2013-02-22
