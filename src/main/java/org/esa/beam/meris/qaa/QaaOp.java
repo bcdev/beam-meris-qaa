@@ -106,7 +106,7 @@ public class QaaOp extends PixelOperator {
     private Qaa qaa;
     private VirtualBandOpImage invalidOpImage;
     private QaaAlgorithm qaaAlgorithm;
-    private QaaResult qaaResult;
+    private ThreadLocal<QaaResult> qaaResult;
 
     @Override
     protected void prepareInputs() throws OperatorException {
@@ -125,7 +125,12 @@ public class QaaOp extends PixelOperator {
         qaaAlgorithm = new QaaAlgorithm();
         final QaaConfig qaaConfig = createConfiguredConfig();
         qaaAlgorithm.setConfig(qaaConfig);
-        qaaResult = new QaaResult();
+        qaaResult = new ThreadLocal<QaaResult>() {
+            @Override
+            protected QaaResult initialValue() {
+                return new QaaResult();
+            }
+        };
         // -----------------
     }
 
@@ -202,7 +207,6 @@ public class QaaOp extends PixelOperator {
         targetProduct.addBand(analyticalFlagBand);
 
         targetProduct.setProductType(PRODUCT_TYPE);
-
     }
 
 
@@ -226,18 +230,30 @@ public class QaaOp extends PixelOperator {
 
     @Override
     protected void computePixel(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
-        qaaResult.reset();
+        new_impl(x, y, sourceSamples, targetSamples);
+
+
+//        old_impl(x, y, sourceSamples, targetSamples);
+    }
+
+    private void new_impl(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
+        //        // @todo 2 tb/tb move to algorithm class 2013-02-26
+        QaaResult result = qaaResult.get();
 
         if (isSampleValid(x, y)) { // Check if it is water
             final float[] rrs = new float[sourceSamples.length];
             for (int i = 0; i < rrs.length; i++) {
                 rrs[i] = sourceSamples[i].getFloat();
             }
-            qaaResult = qaaAlgorithm.process(rrs, qaaResult);
+            result = qaaAlgorithm.process(rrs, result);
         } else {
-            qaaResult.invalidate();
+            result.invalidate();
         }
 
+        writeResult(targetSamples, result);
+    }
+
+    static void writeResult(WritableSample[] targetSamples, QaaResult qaaResult) {
         final float[] a_total = qaaResult.getA_Total();
         for (int i = 0; i < a_total.length; i++) {
             targetSamples[QaaConstants.A_TOTAL_BAND_INDEXES[i]].set(a_total[i]);
@@ -258,46 +274,47 @@ public class QaaOp extends PixelOperator {
             targetSamples[QaaConstants.A_YS_BAND_INDEXES[i]].set(a_ys[i]);
         }
         targetSamples[FLAG_BAND_INDEX].set(qaaResult.getFlags());
+    }
 
+    private void old_impl(int x, int y, Sample[] sourceSamples, WritableSample[] targetSamples) {
+        if (isSampleValid(x, y)) { // Check if it is water
+            final float[] rrs = new float[sourceSamples.length];
+            for (int i = 0; i < rrs.length; i++) {
+                rrs[i] = sourceSamples[i].getFloat();
+                if (divideByPI) {    //Take care of Pi
+                    rrs[i] /= Math.PI;
+                }
+            }
+            try {
+                float[] rrs_pixel = new float[7];
+                float[] a_pixel = new float[6];
+                float[] bbSpm_pixel = new float[6];
+                float[] aPig_pixel = new float[6];
+                float[] aYs_pixel = new float[6];
 
-//        if (isSampleValid(x, y)) { // Check if it is water
-//            final float[] rrs = new float[sourceSamples.length];
-//            for (int i = 0; i < rrs.length; i++) {
-//                rrs[i] = sourceSamples[i].getFloat();
-//                if (divideByPI) {    //Take care of Pi
-//                    rrs[i] /= Math.PI;
-//                }
-//            }
-//            try {
-//                float[] rrs_pixel = new float[7];
-//                float[] a_pixel = new float[6];
-//                float[] bbSpm_pixel = new float[6];
-//                float[] aPig_pixel = new float[6];
-//                float[] aYs_pixel = new float[6];
-//
-//                /**
-//                 * QAA v5 processing
-//                 */
-//                // steps 0-6
-//                // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-//                qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel);
-//                // steps 7-10
-//                qaa.qaaf_decomp(rrs_pixel, a_pixel, aPig_pixel, aYs_pixel);
-//
-//                // fill target samples
-//                targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_VALID, true);
-//
-//                computeATotal(targetSamples, aPig_pixel, aYs_pixel);
-//                computeBbSpm(targetSamples, bbSpm_pixel);
-//                computeAPig(targetSamples, aPig_pixel);
-//                computeAYs(targetSamples, aYs_pixel);
-//
-//            } catch (ImaginaryNumberException ignored) {
-//                handleInvalid(targetSamples, FLAG_INDEX_IMAGINARY);
-//            }
-//        } else {
-//            handleInvalid(targetSamples, FLAG_INDEX_INVALID);
-//        }
+                /**
+                 * QAA v5 processing
+                 */
+                // steps 0-6
+                // The length of pixel is 7 bands, rrs_pixel... are 6 bands
+                qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel);
+                // steps 7-10
+                qaa.qaaf_decomp(rrs_pixel, a_pixel, aPig_pixel, aYs_pixel);
+
+                // fill target samples
+                targetSamples[FLAG_BAND_INDEX].set(FLAG_INDEX_VALID, true);
+
+                computeATotal(targetSamples, aPig_pixel, aYs_pixel);
+                computeBbSpm(targetSamples, bbSpm_pixel);
+                computeAPig(targetSamples, aPig_pixel);
+                computeAYs(targetSamples, aYs_pixel);
+
+            } catch (ImaginaryNumberException ignored) {
+                handleInvalid(targetSamples, FLAG_INDEX_IMAGINARY);
+            }
+        } else {
+            handleInvalid(targetSamples, FLAG_INDEX_INVALID);
+        }
     }
 
     private void computeAYs(WritableSample[] targetSamples, float[] ays_pixel) {

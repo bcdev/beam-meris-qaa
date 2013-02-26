@@ -7,7 +7,6 @@ public class QaaAlgorithm {
     private QaaConfig config;
     private final Qaa qaa;
 
-
     public QaaAlgorithm() {
         qaa = new Qaa(QaaConstants.NO_DATA_VALUE);
         config = new QaaConfig();
@@ -72,7 +71,7 @@ public class QaaAlgorithm {
             result = computeAPig(aPig_pixel, result);
             result = computeAYs(aYs_pixel, result);
         } catch (ImaginaryNumberException e) {
-            result.invalidate();
+            result.invalidateImaginary();
         }
 
         return result;

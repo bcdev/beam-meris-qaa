@@ -83,6 +83,17 @@ public class QaaResultTest {
     }
 
     @Test
+    public void testSetInvalidValid() {
+        result.setValid(false); // remove the valid flag
+
+        result.setInvalid(true);
+        assertEquals(8, result.getFlags());
+
+        result.setInvalid(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
     public void testSetATotalOutOfBounds() {
         result.setValid(false); // remove the valid flag
 
@@ -138,35 +149,34 @@ public class QaaResultTest {
     }
 
     @Test
+    public void testSetImaginary() {
+        result.setValid(false); // remove the valid flag
+
+        result.setImaginary(true);
+        assertEquals(2, result.getFlags());
+
+        result.setImaginary(false);
+        assertEquals(0, result.getFlags());
+    }
+
+    @Test
     public void testInvalidate() {
         result.invalidate();
 
-        final float[] a_pig = result.getA_PIG();
-        assertEquals(QaaConstants.NUM_A_PIG_BANDS, a_pig.length);
-        for (float anA_pig : a_pig) {
-            assertEquals(QaaConstants.NO_DATA_VALUE, anA_pig, 1e-8);
-        }
-
-        final float[] a_total = result.getA_Total();
-        assertEquals(QaaConstants.NUM_A_TOTAL_BANDS, a_total.length);
-        for (float anA_total : a_total) {
-            assertEquals(QaaConstants.NO_DATA_VALUE, anA_total, 1e-8);
-        }
-
-        final float[] a_ys = result.getA_YS();
-        assertEquals(QaaConstants.NUM_A_YS_BANDS, a_ys.length);
-        for (float a_y : a_ys) {
-            assertEquals(QaaConstants.NO_DATA_VALUE, a_y, 1e-8);
-        }
-
-        final float[] bb_spm = result.getBB_SPM();
-        assertEquals(QaaConstants.NUM_BB_SPM_BANDS, bb_spm.length);
-        for (float aBb_spm : bb_spm) {
-            assertEquals(QaaConstants.NO_DATA_VALUE, aBb_spm, 1e-8);
-        }
+        assertAllMeasurementsSetTo(QaaConstants.NO_DATA_VALUE);
 
         final int flags = result.getFlags();
-        assertEquals(0, flags);
+        assertEquals(8, flags);
+    }
+
+    @Test
+    public void testInvalidateImaginary() {
+        result.invalidateImaginary();
+
+        assertAllMeasurementsSetTo(QaaConstants.NO_DATA_VALUE);
+
+        final int flags = result.getFlags();
+        assertEquals(2, flags);
     }
 
     @Test
@@ -188,21 +198,33 @@ public class QaaResultTest {
 
         result.reset();
         assertEquals(1, result.getFlags());
+
+        assertAllMeasurementsSetTo(0.f);
+    }
+
+    private void assertAllMeasurementsSetTo(float expected) {
         final float[] a_pig = result.getA_PIG();
+        assertEquals(QaaConstants.NUM_A_PIG_BANDS, a_pig.length);
         for (float anA_pig : a_pig) {
-            assertEquals(0.f, anA_pig, 1e-8);
+            assertEquals(expected, anA_pig, 1e-8);
         }
+
         final float[] a_total = result.getA_Total();
+        assertEquals(QaaConstants.NUM_A_TOTAL_BANDS, a_total.length);
         for (float anA_total : a_total) {
-            assertEquals(0.f, anA_total, 1e-8);
+            assertEquals(expected, anA_total, 1e-8);
         }
+
         final float[] a_ys = result.getA_YS();
+        assertEquals(QaaConstants.NUM_A_YS_BANDS, a_ys.length);
         for (float a_y : a_ys) {
-            assertEquals(0.f, a_y, 1e-8);
+            assertEquals(expected, a_y, 1e-8);
         }
+
         final float[] bb_spm = result.getBB_SPM();
+        assertEquals(QaaConstants.NUM_BB_SPM_BANDS, bb_spm.length);
         for (float aBb_spm : bb_spm) {
-            assertEquals(0.f, aBb_spm, 1e-8);
+            assertEquals(expected, aBb_spm, 1e-8);
         }
     }
 }
