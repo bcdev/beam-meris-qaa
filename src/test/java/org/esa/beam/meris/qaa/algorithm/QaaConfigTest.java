@@ -1,11 +1,9 @@
-package org.esa.beam.meris.qaa;
+package org.esa.beam.meris.qaa.algorithm;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class QaaConfigTest {
 

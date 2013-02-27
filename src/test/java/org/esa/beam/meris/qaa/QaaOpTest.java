@@ -2,6 +2,7 @@ package org.esa.beam.meris.qaa;
 
 import org.esa.beam.framework.datamodel.RasterDataNode;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
+import org.esa.beam.meris.qaa.algorithm.QaaResult;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -47,15 +48,13 @@ public class QaaOpTest {
         private int intVal;
 
         public RasterDataNode getNode() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
+            return null;
         }
 
         public void set(int i, boolean b) {
-            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public void set(boolean b) {
-            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public void set(int i) {
@@ -67,23 +66,22 @@ public class QaaOpTest {
         }
 
         public void set(double v) {
-            //To change body of implemented methods use File | Settings | File Templates.
         }
 
         public int getIndex() {
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+            return 0;
         }
 
         public int getDataType() {
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+            return 0;
         }
 
         public boolean getBit(int i) {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
+            return false;
         }
 
         public boolean getBoolean() {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
+            return false;
         }
 
         public int getInt() {
@@ -95,7 +93,7 @@ public class QaaOpTest {
         }
 
         public double getDouble() {
-            return 0;  //To change body of implemented methods use File | Settings | File Templates.
+            return 0;
         }
     }
 }

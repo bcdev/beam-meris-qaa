@@ -22,9 +22,5 @@ public class MerisQaaAction extends AbstractVisatAction {
                                                        "QAA for IOP", command.getHelpId());
         operatorDialog.getJDialog().pack();
         operatorDialog.show();
-
-
     }
-
-
 }

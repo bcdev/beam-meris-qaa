@@ -1,4 +1,4 @@
-package org.esa.beam.meris.qaa;
+package org.esa.beam.meris.qaa.algorithm;
 
 public class QaaAlgorithm {
 
@@ -82,6 +82,8 @@ public class QaaAlgorithm {
         if (result == null) {
             result = new QaaResult();
         }
+        result.reset();
+
         return result;
     }
 

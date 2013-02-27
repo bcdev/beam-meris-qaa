@@ -1,15 +1,6 @@
-package org.esa.beam.meris.qaa;
+package org.esa.beam.meris.qaa.algorithm;
 
 public class QaaResult {
-
-    private static final int FLAG_MASK_VALID = 0x0001;
-    private static final int FLAG_MASK_IMAGINARY = 0x0002;
-    private static final int FLAG_MASK_NEGATIVE_AYS = 0x0004;
-    private static final int FLAG_MASK_INVALID = 0x0008;
-    private static final int FLAG_MASK_A_TOTAL_OOB = 0x0010;
-    private static final int FLAG_MASK_BB_SPM_OOB = 0x0020;
-    private static final int FLAG_MASK_A_PIG_OOB = 0x0040;
-    private static final int FLAG_MASK_A_YS_OOB = 0x0080;
 
     private float[] A_Total;
     private float[] BB_SPM;
@@ -61,33 +52,33 @@ public class QaaResult {
     @SuppressWarnings("PointlessBitwiseExpression")
     public void setValid(boolean valid) {
         if (valid) {
-            flags |= FLAG_MASK_VALID;
+            flags |= QaaConstants.FLAG_MASK_VALID;
         } else {
-            flags &= ~FLAG_MASK_VALID;
+            flags &= ~QaaConstants.FLAG_MASK_VALID;
         }
     }
 
     public void setATotalOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
-            flags |= FLAG_MASK_A_TOTAL_OOB;
+            flags |= QaaConstants.FLAG_MASK_A_TOTAL_OOB;
         } else {
-            flags &= ~FLAG_MASK_A_TOTAL_OOB;
+            flags &= ~QaaConstants.FLAG_MASK_A_TOTAL_OOB;
         }
     }
 
     public void setBbSpmOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
-            flags |= FLAG_MASK_BB_SPM_OOB;
+            flags |= QaaConstants.FLAG_MASK_BB_SPM_OOB;
         } else {
-            flags &= ~FLAG_MASK_BB_SPM_OOB;
+            flags &= ~QaaConstants.FLAG_MASK_BB_SPM_OOB;
         }
     }
 
     public void setAPigOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
-            flags |= FLAG_MASK_A_PIG_OOB;
+            flags |= QaaConstants.FLAG_MASK_A_PIG_OOB;
         } else {
-            flags &= ~FLAG_MASK_A_PIG_OOB;
+            flags &= ~QaaConstants.FLAG_MASK_A_PIG_OOB;
         }
     }
 
@@ -97,33 +88,33 @@ public class QaaResult {
 
     public void setAYsOutOfBounds(boolean outOfBounds) {
         if (outOfBounds) {
-            flags |= FLAG_MASK_A_YS_OOB;
+            flags |= QaaConstants.FLAG_MASK_A_YS_OOB;
         } else {
-            flags &= ~FLAG_MASK_A_YS_OOB;
+            flags &= ~QaaConstants.FLAG_MASK_A_YS_OOB;
         }
     }
 
     public void setAYsNegative(boolean isNegative) {
         if (isNegative) {
-            flags |= FLAG_MASK_NEGATIVE_AYS;
+            flags |= QaaConstants.FLAG_MASK_NEGATIVE_AYS;
         } else {
-            flags &= ~FLAG_MASK_NEGATIVE_AYS;
+            flags &= ~QaaConstants.FLAG_MASK_NEGATIVE_AYS;
         }
     }
 
     public void setInvalid(boolean invalid) {
         if (invalid) {
-            flags |= FLAG_MASK_INVALID;
+            flags |= QaaConstants.FLAG_MASK_INVALID;
         } else {
-            flags &= ~FLAG_MASK_INVALID;
+            flags &= ~QaaConstants.FLAG_MASK_INVALID;
         }
     }
 
     public void setImaginary(boolean imaginary) {
         if (imaginary) {
-            flags |= FLAG_MASK_IMAGINARY;
+            flags |= QaaConstants.FLAG_MASK_IMAGINARY;
         } else {
-            flags &= ~FLAG_MASK_IMAGINARY;
+            flags &= ~QaaConstants.FLAG_MASK_IMAGINARY;
         }
     }
 
