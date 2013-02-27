@@ -15,7 +15,7 @@ public class QaaAlgorithmTest {
     }
 
     @Test
-    public void testProcess() throws ImaginaryNumberException {
+    public void testProcess_MERIS() throws ImaginaryNumberException {
         final float[] rrs = {0.030262154f, 0.031086152f, 0.022717977f, 0.013177891f, 0.0072450927f, 0.0028870495f, 0.0024475828f};
 
         final QaaResult result = algorithm.process(rrs, null);
@@ -50,7 +50,6 @@ public class QaaAlgorithmTest {
         assertEquals(0.030918193981051445f, a_ys[0], 1e-8);
         assertEquals(0.019170919433236122f, a_ys[1], 1e-8);
         assertEquals(0.009288343600928783f, a_ys[2], 1e-8);
-
     }
 
     // @todo 3 tb/tb test divide by PI 2013-02-22
