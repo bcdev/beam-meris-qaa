@@ -12,7 +12,7 @@ class Qaa {
     private static final double[] acoefs = {-1.273, -1.163, -0.295};
 
 
-    private float noDataValue;
+    private final float noDataValue;
 
     Qaa(float noDataValue) {
         this.noDataValue = noDataValue;

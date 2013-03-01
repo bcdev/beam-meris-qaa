@@ -3,7 +3,7 @@
 
     <symbolicName>beam-meris-qaa</symbolicName>
     <name>QAA IOP Processor</name>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <description>
         <![CDATA[
@@ -20,6 +20,8 @@
 
     <changelog>
         <![CDATA[
+        Changes in 1.2:<br/>
+        [QAA-010] Extract algorithm class that allows processing on input reflectance vector<br/>
         Changes in 1.1:<br/>
         [QAA-009] Rename IOPs in user interface according to the resulting band names<br/>
         [QAA-008] Introduce flags to indicate values which are out of bounds<br/>

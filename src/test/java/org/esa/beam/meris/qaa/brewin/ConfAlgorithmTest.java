@@ -2,7 +2,6 @@ package org.esa.beam.meris.qaa.brewin;
 
 import org.esa.beam.meris.qaa.algorithm.ImaginaryNumberException;
 import org.esa.beam.meris.qaa.algorithm.QaaResult;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -106,35 +105,45 @@ public class ConfAlgorithmTest {
     }
 
     @Test
-    @Ignore
     public void testProcess_Meris_oldCoeffs() throws ImaginaryNumberException {
-        final float[] rrs_in = {0.030262154f, 0.031086152f, 0.022717977f, 0.013177891f, 0.0072450927f, 0.0028870495f, 0.0024475828f};
+        // this testcase implements a comparison between the old implementation used in te operator and the
+        // algorithm supplied by PML - the assertions of the old testcase are used to test the new algorithm with the
+        // configuration used by the old algorithm tb 2013-03-01
+        final float[] rrs_in = {0.030262154f, 0.031086152f, 0.022717977f, 0.013177891f, 0.0072450927f, 0.0024475828f};
+
+        // old input vector was not normalized to PI - do it now tb 2013-03-01
+        for (int i = 0; i < rrs_in.length; i++) {
+            rrs_in[i] /= Math.PI;
+
+        }
+        //                       413               440          490          510            560            620              665
+        //final float[] rrs = {0.030262154f, 0.031086152f, 0.022717977f, 0.013177891f, 0.0072450927f, 0.0028870495f, 0.0024475828f};
 
         final ConfAlgorithm algorithm = new ConfAlgorithm(new MerisConfigOldCoeffs());
 
         final QaaResult result = algorithm.process(rrs_in, null);
         final float[] a_total = result.getA_Total();
-        assertEquals(0.03845500573515892f, a_total[0], 1e-8);
-        assertEquals(0.030030209571123123f, a_total[1], 1e-8);
-        assertEquals(0.030713409185409546f, a_total[2], 1e-8);
-        assertEquals(0.046738818287849426f, a_total[3], 1e-8);
-        assertEquals(0.06614950299263f, a_total[4], 1e-8);
+        assertEquals(0.03845500573515892f, a_total[0], 1e-4);
+        assertEquals(0.030030209571123123f, a_total[1], 1e-4);
+        assertEquals(0.030713409185409546f, a_total[2], 1e-4);
+        assertEquals(0.046738818287849426f, a_total[3], 1e-4);
+        assertEquals(0.06614950299263f, a_total[4], 1e-4);
 
         final float[] bb_spm = result.getBB_SPM();
-        assertEquals(0.007518719881772995f, bb_spm[0], 1e-8);
-        assertEquals(0.006027825176715851f, bb_spm[1], 1e-8);
-        assertEquals(0.004540313966572285f, bb_spm[2], 1e-8);
-        assertEquals(0.0040666270069777966f, bb_spm[3], 1e-8);
-        assertEquals(0.0032066269777715206f, bb_spm[4], 1e-8);
+        assertEquals(0.007518719881772995f, bb_spm[0], 1e-4);
+        assertEquals(0.006027825176715851f, bb_spm[1], 1e-4);
+        assertEquals(0.004540313966572285f, bb_spm[2], 1e-4);
+        assertEquals(0.0040666270069777966f, bb_spm[3], 1e-4);
+        assertEquals(0.0032066269777715206f, bb_spm[4], 1e-4);
 
         final float[] a_pig = result.getA_PIG();
-        assertEquals(0.0028468116652220488f, a_pig[0], 1e-8);
-        assertEquals(0.0036492901854217052f, a_pig[1], 1e-8);
-        assertEquals(0.006425064522773027f, a_pig[2], 1e-8);
+        assertEquals(0.0028468116652220488f, a_pig[0], 1e-4);
+        assertEquals(0.0036492901854217052f, a_pig[1], 1e-4);
+        assertEquals(0.006425064522773027f, a_pig[2], 1e-4);
 
         final float[] a_ys = result.getA_YS();
-        assertEquals(0.030918193981051445f, a_ys[0], 1e-8);
-        assertEquals(0.019170919433236122f, a_ys[1], 1e-8);
-        assertEquals(0.009288343600928783f, a_ys[2], 1e-8);
+        assertEquals(0.030918193981051445f, a_ys[0], 1e-4);
+        assertEquals(0.019170919433236122f, a_ys[1], 1e-4);
+        assertEquals(0.009288343600928783f, a_ys[2], 1e-4);
     }
 }
