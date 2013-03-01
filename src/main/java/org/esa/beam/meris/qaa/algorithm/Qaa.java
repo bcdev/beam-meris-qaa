@@ -37,7 +37,7 @@ class Qaa {
         Rrs670_lower = (float) (0.9 * Math.pow(Rrs[IDX_560], 1.7));
         // if Rrs[670] out of bounds, reassign its value by QAA v5.
         if (Rrs[IDX_670] > Rrs670_upper || Rrs[IDX_670] < Rrs670_lower || Rrs[IDX_670] == noDataValue) {
-            float Rrs670 = (float) (0.00018 * Math.pow(Rrs[IDX_490] / Rrs[IDX_560], 3.19));
+            float Rrs670 = (float) (0.00018 * Math.pow(Rrs[IDX_490] / Rrs[IDX_560], -3.19));
             Rrs670 += (float) (1.27 * Math.pow(Rrs[IDX_560], 1.47));
             Rrs[IDX_670] = Rrs670;
         }
