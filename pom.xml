@@ -14,7 +14,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <beamVersion>4.9</beamVersion>
         <beam.version>5.0-SNAPSHOT</beam.version>
     </properties>
 
@@ -22,23 +21,18 @@
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-gpf</artifactId>
-            <version>${beamVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.esa.beam</groupId>
-            <artifactId>beam-binning2</artifactId>
-            <version>0.8.1.${beam.version}</version>
+            <version>${beam.version}</version>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-visat-rcp</artifactId>
-            <version>${beamVersion}</version>
+            <version>${beam.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.esa.beam</groupId>
             <artifactId>beam-envisat-reader</artifactId>
-            <version>1.4</version>
+            <version>1.5.2.${beam.version}</version>
         </dependency>
     </dependencies>
 
