@@ -1,14 +1,22 @@
 package org.esa.beam.meris.qaa;
 
 import org.esa.beam.dataio.envisat.EnvisatConstants;
-import org.esa.beam.framework.datamodel.*;
+import org.esa.beam.framework.datamodel.Band;
+import org.esa.beam.framework.datamodel.FlagCoding;
+import org.esa.beam.framework.datamodel.Mask;
+import org.esa.beam.framework.datamodel.Product;
+import org.esa.beam.framework.datamodel.ProductData;
 import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
 import org.esa.beam.framework.gpf.annotations.Parameter;
 import org.esa.beam.framework.gpf.annotations.SourceProduct;
-import org.esa.beam.framework.gpf.pointop.*;
+import org.esa.beam.framework.gpf.pointop.PixelOperator;
+import org.esa.beam.framework.gpf.pointop.ProductConfigurer;
+import org.esa.beam.framework.gpf.pointop.Sample;
+import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
+import org.esa.beam.framework.gpf.pointop.WritableSample;
 import org.esa.beam.jai.ResolutionLevel;
 import org.esa.beam.jai.VirtualBandOpImage;
 import org.esa.beam.meris.qaa.algorithm.QaaAlgorithm;
@@ -19,7 +27,8 @@ import org.esa.beam.util.ArrayUtils;
 import org.esa.beam.util.StringUtils;
 import org.esa.beam.util.logging.BeamLogManager;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,11 +37,11 @@ import java.util.logging.Logger;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @OperatorMetadata(alias = "Meris.QaaIOP",
-        description = "Performs retrieval of inherent optical properties (IOPs) for " +
-                "coastal and open ocean waters for MERIS.",
-        authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
-        copyright = "(C) 2011 by NRL and WSU",
-        version = "1.1")
+                  description = "Performs retrieval of inherent optical properties (IOPs) for " +
+                                "coastal and open ocean waters for MERIS.",
+                  authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
+                  copyright = "(C) 2013 by NRL and WSU",
+                  version = "1.3")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
@@ -46,45 +55,45 @@ public class QaaOp extends PixelOperator {
     private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
 
 
-    @SourceProduct(alias = "source", description = "The source product.",
-            bands = {
-                    EnvisatConstants.MERIS_L2_REFLEC_1_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_2_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_3_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_4_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
-                    EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
-            })
+    @SourceProduct(alias = "source", label = "Source", description = "The source product containing reflectances.",
+                   bands = {
+                           EnvisatConstants.MERIS_L2_REFLEC_1_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_2_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_3_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_4_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
+                           EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
+                   })
     private Product sourceProduct;
 
     @Parameter(defaultValue = "not l2_flags.WATER",
-            description = "Expression defining pixels not considered for processing.")
+               description = "Expression defining pixels not considered for processing.")
     private String invalidPixelExpression;
 
     @Parameter(defaultValue = "-0.02", label = "'A_TOTAL' lower bound",
-            description = "The lower bound of the valid value range.")
+               description = "The lower bound of the valid value range.")
     private float aTotalLower;
     @Parameter(defaultValue = "5.0", label = "'A_TOTAL' upper bound",
-            description = "The upper bound of the valid value range.")
+               description = "The upper bound of the valid value range.")
     private float aTotalUpper;
     @Parameter(defaultValue = "-0.2", label = "'BB_SPM' lower bound",
-            description = "The lower bound of the valid value range.")
+               description = "The lower bound of the valid value range.")
     private float bbSpmLower;
     @Parameter(defaultValue = "5.0", label = "'BB_SPM' upper bound",
-            description = "The upper bound of the valid value range.")
+               description = "The upper bound of the valid value range.")
     private float bbSpmUpper;
     @Parameter(defaultValue = "-0.02", label = "'A_PIG' lower bound",
-            description = "The lower bound of the valid value range.")
+               description = "The lower bound of the valid value range.")
     private float aPigLower;
     @Parameter(defaultValue = "3.0", label = "'A_PIG' upper bound",
-            description = "The upper bound of the valid value range.")
+               description = "The upper bound of the valid value range.")
     private float aPigUpper;
     @Parameter(defaultValue = "1.0", label = "'A_YS' upper bound",
-            description = "The upper bound of the valid value range. The lower bound is always 0.")
+               description = "The upper bound of the valid value range. The lower bound is always 0.")
     private float aYsUpper;
     @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)",
-            description = "If selected the source remote reflectances are divided by PI")
+               description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
     private VirtualBandOpImage invalidOpImage;
@@ -96,12 +105,12 @@ public class QaaOp extends PixelOperator {
         validateSourceProduct();
         if (!sourceProduct.isCompatibleBandArithmeticExpression(invalidPixelExpression)) {
             String message = String.format("The given expression '%s' is not compatible with the source product.",
-                    invalidPixelExpression);
+                                           invalidPixelExpression);
             throw new OperatorException(message);
         }
         invalidOpImage = VirtualBandOpImage.createMask(invalidPixelExpression,
-                sourceProduct,
-                ResolutionLevel.MAXRES);
+                                                       sourceProduct,
+                                                       ResolutionLevel.MAXRES);
 
         qaaAlgorithm = new QaaAlgorithm();
         qaaAlgorithm.setConfig(createConfiguredConfig());
@@ -121,7 +130,7 @@ public class QaaOp extends PixelOperator {
         config.setAPigUpper(aPigUpper);
         config.setATotalLower(aTotalLower);
         config.setATotalUpper(aTotalUpper);
-        config.setAYsLower(0.f);
+        config.setAYsLower(0.0f);
         config.setAYsUpper(aYsUpper);
         config.setBbSpmsLower(bbSpmLower);
         config.setBbSpmsUpper(bbSpmUpper);
@@ -159,28 +168,28 @@ public class QaaOp extends PixelOperator {
 
         //noinspection PointlessBitwiseExpression
         addFlagAndMask(targetProduct, flagCoding, "normal", "A valid water pixel.",
-                1 << QaaConstants.FLAG_INDEX_VALID, Color.BLUE);
+                       1 << QaaConstants.FLAG_INDEX_VALID, Color.BLUE);
         addFlagAndMask(targetProduct, flagCoding, "imaginary_number",
-                "Classified as water, but an imaginary number would have been produced.",
-                1 << QaaConstants.FLAG_INDEX_IMAGINARY, Color.RED);
+                       "Classified as water, but an imaginary number would have been produced.",
+                       1 << QaaConstants.FLAG_INDEX_IMAGINARY, Color.RED);
         addFlagAndMask(targetProduct, flagCoding, "negative_a_ys",
-                "Classified as water, but one or more of the bands contain a negative a_ys value.",
-                1 << QaaConstants.FLAG_INDEX_NEGATIVE_AYS, Color.YELLOW);
+                       "Classified as water, but one or more of the bands contain a negative a_ys value.",
+                       1 << QaaConstants.FLAG_INDEX_NEGATIVE_AYS, Color.YELLOW);
         addFlagAndMask(targetProduct, flagCoding, "non_water",
-                "Not classified as a water pixel (land/cloud).",
-                1 << QaaConstants.FLAG_INDEX_INVALID, Color.BLACK);
+                       "Not classified as a water pixel (land/cloud).",
+                       1 << QaaConstants.FLAG_INDEX_INVALID, Color.BLACK);
         addFlagAndMask(targetProduct, flagCoding, "a_total_oob",
-                "At least one value of the a_total spectrum is out of bounds.",
-                1 << QaaConstants.FLAG_INDEX_A_TOTAL_OOB, Color.CYAN);
+                       "At least one value of the a_total spectrum is out of bounds.",
+                       1 << QaaConstants.FLAG_INDEX_A_TOTAL_OOB, Color.CYAN);
         addFlagAndMask(targetProduct, flagCoding, "bb_spm_oob",
-                "At least one value of the bb_spm spectrum is out of bounds.",
-                1 << QaaConstants.FLAG_INDEX_BB_SPM_OOB, Color.MAGENTA);
+                       "At least one value of the bb_spm spectrum is out of bounds.",
+                       1 << QaaConstants.FLAG_INDEX_BB_SPM_OOB, Color.MAGENTA);
         addFlagAndMask(targetProduct, flagCoding, "a_pig_oob",
-                "At least one value of the a_pig spectrum is out of bounds.",
-                1 << QaaConstants.FLAG_INDEX_A_PIG_OOB, Color.ORANGE);
+                       "At least one value of the a_pig spectrum is out of bounds.",
+                       1 << QaaConstants.FLAG_INDEX_A_PIG_OOB, Color.ORANGE);
         addFlagAndMask(targetProduct, flagCoding, "a_ys_oob",
-                "At least one value of the a_ys spectrum is out of bounds.",
-                1 << QaaConstants.FLAG_INDEX_A_YS_OOB, Color.PINK);
+                       "At least one value of the a_ys spectrum is out of bounds.",
+                       1 << QaaConstants.FLAG_INDEX_A_YS_OOB, Color.PINK);
 
         Band analyticalFlagBand = new Band(ANALYSIS_FLAG_BAND_NAME, ProductData.TYPE_UINT8, sceneWidth, sceneHeight);
         analyticalFlagBand.setSampleCoding(flagCoding);
@@ -266,10 +275,10 @@ public class QaaOp extends PixelOperator {
                                 int flagMask, Color color) {
         flagCoding.addFlag(flagName, flagMask, flagDescription);
         final Mask mask = Mask.BandMathsType.create(flagName, flagDescription,
-                targetProduct.getSceneRasterWidth(),
-                targetProduct.getSceneRasterHeight(),
-                ANALYSIS_FLAG_BAND_NAME + "." + flagName,
-                color, 0.5f);
+                                                    targetProduct.getSceneRasterWidth(),
+                                                    targetProduct.getSceneRasterHeight(),
+                                                    ANALYSIS_FLAG_BAND_NAME + "." + flagName,
+                                                    color, 0.5f);
         targetProduct.getMaskGroup().add(mask);
     }
 
@@ -306,7 +315,7 @@ public class QaaOp extends PixelOperator {
 
         @Override
         public Operator createOperator(Map<String, Object> parameters, Map<String, Product> sourceProducts) throws
-                OperatorException {
+                                                                                                            OperatorException {
             if (isDeprecatedParameterUsed(parameters)) {
                 logWarning();
                 mapParameterValuesToNewParameter(parameters);
@@ -349,8 +358,8 @@ public class QaaOp extends PixelOperator {
             String newParameterName = deprecatedParameterEntry.getValue();
             parameters.put(newParameterName, usedParameterValue);
             logger.log(Level.INFO, String.format("Mapping value [%s] from '%s' to '%s'",
-                    usedParameterValue, usedParameterName,
-                    newParameterName));
+                                                 usedParameterValue, usedParameterName,
+                                                 newParameterName));
         }
 
         private void logWarning() {
@@ -362,10 +371,10 @@ public class QaaOp extends PixelOperator {
             }
             String deprecatedParamsList = sb.toString();
             logger.log(Level.WARNING, "Deprecated parameter names are used.\n" +
-                    "Deprecated names are:\n" +
-                    deprecatedParamsList +
-                    "The given parameter values are mapped to the new parameters.\n" +
-                    "Please update your parameter configuration."
+                                      "Deprecated names are:\n" +
+                                      deprecatedParamsList +
+                                      "The given parameter values are mapped to the new parameters.\n" +
+                                      "Please update your parameter configuration."
             );
         }
     }
