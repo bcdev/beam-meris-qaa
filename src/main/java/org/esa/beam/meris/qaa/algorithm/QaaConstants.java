@@ -12,14 +12,15 @@ public final class QaaConstants {
 
     public static final int[] WAVELENGTH = {412, 443, 490, 510, 560, 620};
 
-    public static final int FLAG_INDEX_VALID = 0;
-    public static final int FLAG_INDEX_IMAGINARY = 1;
-    public static final int FLAG_INDEX_NEGATIVE_AYS = 2;
-    public static final int FLAG_INDEX_INVALID = 3;
-    public static final int FLAG_INDEX_A_TOTAL_OOB = 4;
-    public static final int FLAG_INDEX_BB_SPM_OOB = 5;
-    public static final int FLAG_INDEX_A_PIG_OOB = 6;
-    public static final int FLAG_INDEX_A_YS_OOB = 7;
+    public static final int FLAG_MASK_VALID = 0x0001;
+    public static final int FLAG_MASK_IMAGINARY = 0x0002;
+    public static final int FLAG_MASK_NEGATIVE_AYS = 0x0004;
+    public static final int FLAG_MASK_INVALID = 0x0008;
+    public static final int FLAG_MASK_A_TOTAL_OOB = 0x0010;
+    public static final int FLAG_MASK_BB_SPM_OOB = 0x0020;
+    public static final int FLAG_MASK_A_PIG_OOB = 0x0040;
+    public static final int FLAG_MASK_A_YS_OOB = 0x0080;
+
 
     // @todo tb/tb 4 make configurable?? 2013-02-22
     public static final float NO_DATA_VALUE = Float.NaN;
@@ -50,15 +51,6 @@ public final class QaaConstants {
     static final int NUM_A_YS_BANDS = 3;
     static final float A_YS_LOWER_DEFAULT = 0.f;
     static final float A_YS_UPPER_DEFAULT = 1.f;
-
-    static final int FLAG_MASK_VALID = 0x0001;
-    static final int FLAG_MASK_IMAGINARY = 0x0002;
-    static final int FLAG_MASK_NEGATIVE_AYS = 0x0004;
-    static final int FLAG_MASK_INVALID = 0x0008;
-    static final int FLAG_MASK_A_TOTAL_OOB = 0x0010;
-    static final int FLAG_MASK_BB_SPM_OOB = 0x0020;
-    static final int FLAG_MASK_A_PIG_OOB = 0x0040;
-    static final int FLAG_MASK_A_YS_OOB = 0x0080;
 
     private QaaConstants() {
     }

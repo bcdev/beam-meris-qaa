@@ -67,9 +67,13 @@ public class QaaOp extends PixelOperator {
                    })
     private Product sourceProduct;
 
-    @Parameter(defaultValue = "not l2_flags.WATER",
-               description = "Expression defining pixels not considered for processing.")
-    private String invalidPixelExpression;
+    @Parameter(defaultValue = "l2_flags.WATER",
+               description = "Expression defining pixels considered for processing.")
+    private String validPixelExpression;
+
+    @Deprecated
+    @Parameter(description = "Deprecated parameter. Use 'validPixelExpression' instead.")
+    String invalidPixelExpression;
 
     @Parameter(defaultValue = "-0.02", label = "'A_TOTAL' lower bound",
                description = "The lower bound of the valid value range.")
@@ -96,21 +100,17 @@ public class QaaOp extends PixelOperator {
                description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
-    private VirtualBandOpImage invalidOpImage;
+    private VirtualBandOpImage validOpImage;
     private QaaAlgorithm qaaAlgorithm;
     private ThreadLocal<QaaResult> qaaResult;
 
     @Override
     protected void prepareInputs() throws OperatorException {
         validateSourceProduct();
-        if (!sourceProduct.isCompatibleBandArithmeticExpression(invalidPixelExpression)) {
-            String message = String.format("The given expression '%s' is not compatible with the source product.",
-                                           invalidPixelExpression);
-            throw new OperatorException(message);
-        }
-        invalidOpImage = VirtualBandOpImage.createMask(invalidPixelExpression,
-                                                       sourceProduct,
-                                                       ResolutionLevel.MAXRES);
+        validateParameters();
+        validOpImage = VirtualBandOpImage.createMask(validPixelExpression,
+                                                     sourceProduct,
+                                                     ResolutionLevel.MAXRES);
 
         qaaAlgorithm = new QaaAlgorithm();
         qaaAlgorithm.setConfig(createConfiguredConfig());
@@ -167,29 +167,29 @@ public class QaaOp extends PixelOperator {
         targetProduct.getFlagCodingGroup().add(flagCoding);
 
         //noinspection PointlessBitwiseExpression
-        addFlagAndMask(targetProduct, flagCoding, "normal", "A valid water pixel.",
-                       1 << QaaConstants.FLAG_INDEX_VALID, Color.BLUE);
+        addFlagAndMask(targetProduct, flagCoding, "normal", "Valid water pixels",
+                       QaaConstants.FLAG_MASK_VALID, Color.BLUE);
         addFlagAndMask(targetProduct, flagCoding, "imaginary_number",
-                       "Classified as water, but an imaginary number would have been produced.",
-                       1 << QaaConstants.FLAG_INDEX_IMAGINARY, Color.RED);
+                       "Pixels that are classified as water, but an imaginary number would have been produced",
+                       QaaConstants.FLAG_MASK_IMAGINARY, Color.RED);
         addFlagAndMask(targetProduct, flagCoding, "negative_a_ys",
-                       "Classified as water, but one or more of the bands contain a negative a_ys value.",
-                       1 << QaaConstants.FLAG_INDEX_NEGATIVE_AYS, Color.YELLOW);
+                       "Pixels that are classified  as water, but one or more of the bands contain a negative a_ys value",
+                       QaaConstants.FLAG_MASK_NEGATIVE_AYS, Color.YELLOW);
         addFlagAndMask(targetProduct, flagCoding, "non_water",
-                       "Not classified as a water pixel (land/cloud).",
-                       1 << QaaConstants.FLAG_INDEX_INVALID, Color.BLACK);
+                       "Pixels that are not classified as a water pixel (land/cloud)",
+                       QaaConstants.FLAG_MASK_INVALID, Color.BLACK);
         addFlagAndMask(targetProduct, flagCoding, "a_total_oob",
-                       "At least one value of the a_total spectrum is out of bounds.",
-                       1 << QaaConstants.FLAG_INDEX_A_TOTAL_OOB, Color.CYAN);
+                       "At least one value of the a_total spectrum is out of bounds",
+                       QaaConstants.FLAG_MASK_A_TOTAL_OOB, Color.CYAN);
         addFlagAndMask(targetProduct, flagCoding, "bb_spm_oob",
-                       "At least one value of the bb_spm spectrum is out of bounds.",
-                       1 << QaaConstants.FLAG_INDEX_BB_SPM_OOB, Color.MAGENTA);
+                       "At least one value of the bb_spm spectrum is out of bounds",
+                       QaaConstants.FLAG_MASK_BB_SPM_OOB, Color.MAGENTA);
         addFlagAndMask(targetProduct, flagCoding, "a_pig_oob",
-                       "At least one value of the a_pig spectrum is out of bounds.",
-                       1 << QaaConstants.FLAG_INDEX_A_PIG_OOB, Color.ORANGE);
+                       "At least one value of the a_pig spectrum is out of bounds",
+                       QaaConstants.FLAG_MASK_A_PIG_OOB, Color.ORANGE);
         addFlagAndMask(targetProduct, flagCoding, "a_ys_oob",
-                       "At least one value of the a_ys spectrum is out of bounds.",
-                       1 << QaaConstants.FLAG_INDEX_A_YS_OOB, Color.PINK);
+                       "At least one value of the a_ys spectrum is out of bounds",
+                       QaaConstants.FLAG_MASK_A_YS_OOB, Color.PINK);
 
         Band analyticalFlagBand = new Band(ANALYSIS_FLAG_BAND_NAME, ProductData.TYPE_UINT8, sceneWidth, sceneHeight);
         analyticalFlagBand.setSampleCoding(flagCoding);
@@ -267,8 +267,22 @@ public class QaaOp extends PixelOperator {
         }
     }
 
+    private void validateParameters() {
+        if (StringUtils.isNotNullAndNotEmpty(invalidPixelExpression)) {
+            validPixelExpression = "not (" + invalidPixelExpression + ")";
+            final String message = String.format("The parameter 'invalidPixelExpression' is deprecated. Please use 'validPixelExpression' instead. " +
+                                                 "The expression is converted to '%s'", validPixelExpression);
+            getLogger().warning(message);
+        }
+        if (!sourceProduct.isCompatibleBandArithmeticExpression(validPixelExpression)) {
+            String message = String.format("The given expression '%s' is not compatible with the source product.",
+                                           validPixelExpression);
+            throw new OperatorException(message);
+        }
+    }
+
     private boolean isSampleValid(int x, int y) {
-        return invalidOpImage.getData(new Rectangle(x, y, 1, 1)).getSample(x, y, 0) == 0;
+        return validOpImage.getData(new Rectangle(x, y, 1, 1)).getSample(x, y, 0) != 0;
     }
 
     private void addFlagAndMask(Product targetProduct, FlagCoding flagCoding, String flagName, String flagDescription,

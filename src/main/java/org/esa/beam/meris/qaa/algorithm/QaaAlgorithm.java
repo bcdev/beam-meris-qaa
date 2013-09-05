@@ -31,6 +31,7 @@ public class QaaAlgorithm {
      *               rrs_in[4] @ 560   nm
      *               rrs_in[5] @ 620   nm
      *               rrs_in[6] @ 665   nm
+     *
      * @return the computation result
      */
     public QaaResult process(float[] rrs_in, QaaResult recycle) {
@@ -70,7 +71,7 @@ public class QaaAlgorithm {
             result = computeBbSpm(bbSpm_pixel, result);
             result = computeAPig(aPig_pixel, result);
             result = computeAYs(aYs_pixel, result);
-        } catch (ImaginaryNumberException e) {
+        } catch (ImaginaryNumberException ignore) {
             result.invalidateImaginary();
         }
 

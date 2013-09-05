@@ -1,0 +1,167 @@
+<!--
+  ~ Copyright (C) 2010 Brockmann Consult GmbH (info@brockmann-consult.de)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option)
+  ~ any later version.
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+  ~ more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, see http://www.gnu.org/licenses/
+  -->
+
+<html>
+<head>
+    <title>BEAM Data Processors - QAA Processor Description</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+            QAA Processor Description
+        </td>
+        <td class="header" align="right"><a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg"
+                                                                                     border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h3>User Interface</h3>
+
+<p>
+    The QAA processor can be invoked from the VISAT tools menu by selecting
+    the <b>QAA for IOP (MERIS)...</b> command. On the command line the QAA processor is
+    available by means of the Graph Processing Tool <code>gpt</code> which is located in the BEAM <code>bin</code>
+    directory. Typing <code>gpt Meris.QaaIOP -h</code> displays further information.
+</p>
+
+<p>
+    Selecting the <b>QAA for IOP (MERIS)...</b> command from the VISAT tools menu pops up the
+    following dialog:
+</p>
+
+<h4>I/O Parameters Tab</h4>
+
+<p align="center"><img src="images/IOParameters.png"></p>
+
+<h5>Source Product Group</h5>
+
+<p class="i1">
+    <b>Source product:</b>
+    Here the source productis specified. The combo box presents
+    a list of all products open in VISAT. The user may select one of these
+    or, by clicking on the button next to the combo box, choose a product
+    from the file system.
+</p>
+
+<h5>Target Product Group</h5>
+
+<p class="i1">
+    <b>Name:</b>
+    Used to specify the name of the target product.
+</p>
+
+<p class="i1">
+    <b>Save as:</b>
+    Used to specify whether the target product should be saved to the file system. The
+    combo box presents a list of available file formats.
+    The text field or the button next to it allow to specify a target directory.
+</p>
+
+<p class="i1">
+    <b>Open in VISAT:</b>
+    Used to specify whether the target product should be opened in VISAT. When the target product is not saved, it is opened in VISAT automatically.
+</p>
+
+<p align="center"><img src="images/ProcessingParameters.png"></p>
+
+<h4>Processing Parameters Tab</h4>
+
+<p class="i1">
+    <b>Valid pixel expression:</b> An expression defining pixels considered for processing. By default the expression is set
+    to '<i>l2_flags.WATER</i>'.
+</p>
+
+<p class="i1">
+    <b>'A_TOTAL' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.02) the flag
+    '<i>a_total_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'A_TOTAL' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 5.0) the flag
+    '<i>a_total_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'BB_SPM' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.2) the flag
+    '<i>bb_spm_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'BB_SPM' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 5.0) the flag
+    '<i>bb_spm_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'A_PIG' lower bound</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.02) the flag
+    '<i>a_pig_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'A_PIG' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 3.0) the flag
+    '<i>a_pig_oob</i>' is set and the "No-Data" value is written to the target product instead.
+</p>
+
+<p class="i1">
+    <b>'A_YS' upper bound:</b> The upper bound (default: 1.0) of the valid value range. The lower bound is always 0. If the computed value is above or
+    below one
+    of these boundaries the flag '<i>a_ys_oob</i>' is set and the "No-Data" value is written to the target product instead. If the value is below zero
+    additionally the flag '<i>negative_a_ys</i>' is set.
+</p>
+
+<p class="i1">
+    <b>Divide source Rrs by PI(3.14):</b> If selected the source remote sensing reflectances are divided by PI.
+</p>
+
+<h5>Button Group</h5>
+
+<p class="i1">
+    <b>Run</b>
+    Creates the target product. The QAA processing is actually deferred until its band data are accessed, either by
+    writing the product to a file or by opening its bands in VISAT. When the <b>Save as</b> option is checked, the QAA
+    processing is triggered automatically.
+</p>
+
+<p class="i1">
+    <b>Close</b>
+    Closes the dialog.
+</p>
+
+<p class="i1">
+    <b>Help</b> Opens this Help window.
+</p>
+
+<h5>Menu Group</h5>
+
+<p class="i1">
+    <b>File</b>
+    The entries found in this menu allow to save the current processing parameters to a file and to open a saved parameter
+    set from a file.
+</p>
+
+<p class="i1">
+    <b>Help</b>
+    Has entries to open the About dialog and to open the Help window.
+</p>
+
+<br>
+<hr>
+</body>
+</html>

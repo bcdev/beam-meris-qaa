@@ -67,8 +67,8 @@ public class QaaForm extends JTabbedPane {
     }
 
     private JScrollPane createParametersPanel(final AppContext appContext, PropertySet propertySet) {
-        PropertyDescriptor invExpressionDescriptor = propertySet.getDescriptor("invalidPixelExpression");
-        invExpressionDescriptor.setAttribute("propertyEditor", new ExpressionPropertyEditor(appContext));
+        PropertyDescriptor validExpressionDescriptor = propertySet.getDescriptor("validPixelExpression");
+        validExpressionDescriptor.setAttribute("propertyEditor", new ExpressionPropertyEditor(appContext));
         PropertyPane parametersPane = new PropertyPane(propertySet);
         final JPanel parametersPanel = parametersPane.createPanel();
         parametersPanel.setBorder(new EmptyBorder(4, 4, 4, 4));
