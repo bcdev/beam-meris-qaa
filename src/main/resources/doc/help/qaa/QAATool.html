@@ -1,0 +1,83 @@
+<!--
+  ~ Copyright (C) 2010 Brockmann Consult GmbH (info@brockmann-consult.de)
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it
+  ~ under the terms of the GNU General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option)
+  ~ any later version.
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  ~ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+  ~ more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along
+  ~ with this program; if not, see http://www.gnu.org/licenses/
+  -->
+
+<html>
+<head>
+    <title>BEAM Data Processors - QAA Processor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<table class="header">
+    <tr class="header">
+        <td class="header">&nbsp;
+            QAA Processor
+        </td>
+        <td class="header" align="right"><a href="../general/BeamOverview.html"><img src="../images/BeamHeader.jpg" border=0></a>
+        </td>
+    </tr>
+</table>
+
+<h3>Overview</h3>
+
+<p>This processor is used to derive absorption and backscattering coefficients for open ocean and coastal waters of MERIS images. The Quasi Analytical
+    Algorithm (QAA) has been originally developed by <i>Lee at al</i>. It is based on remote-sensing reflectances models and
+    uses therefor MERIS Level 2 data as input. <br>
+    An valid pixel expression is used to determine which pixels are processed. This expression is set by default to <i>'l2_flags.WATER'</i>. This
+    means
+    that only pixels determined as water are processed, other pixels (land, clouds) will be assigned a No-Data value (NaN) to all bands.
+    Also, only bands below 670nm are used in the processing. In the case of MERIS band settings, the first 7 bands are used in the processing.<br>
+    Besides MERIS Level 2 data it is also possible to process atmospherically corrected MERIS Level 1 data.
+    It is only required that the reflectance bands follow the same name pattern as in MERIS L2. The expression to
+    detect valid pixels can be changed as necessary for the specific product.</p>
+
+<h3>Coefficient Bands</h3>
+
+<p>The following absorption and backscattering coefficients are generated at different wavelengths:</p>
+<ul>
+    <li><b>a_total</b> - The total absorption coefficient of all water constituents is given for the wavelengths at 412, 443, 490, 510 and 560.</li>
+    <li><b>bb_spm</b> - The backscattering of suspended particulate matter is given for the wavelengths at 412, 443, 490, 510 and 560.</li>
+    <li><b>a_pig</b> - The pigment absorption coefficient is given for the wavelengths at 412, 443 and 490.</li>
+    <li><b>a_ys</b> - The yellow substance absorption coefficient is given for the wavelengths at 412, 443 and 490.</li>
+</ul>
+
+<h3>Flag Band</h3>
+
+<p>The Quasi-Analytical Processor provides a flag band with the result product. It is named <i>'analytical_flags'</i> and contains
+    flags specific for the Quasi-Analytical Processor..</p>
+<ul>
+    <li><b>normal</b> - Valid water pixels.</li>
+    <li><b>imaginary_number</b> - Pixels that are classified as water, but an imaginary number would have been produced in step one of the algorithm.
+    </li>
+    <li><b>negative_a_ys</b> - Pixels that are classified as water, but one or more of the bands contain a negative <i>'a_ys'</i> value.</li>
+    <li><b>non_water</b> - Pixels that are not classified as a water (land/cloud).</li>
+    <li><b>a_total_oob</b> - At least one value of the <i>'a_total'</i> spectrum is out of bounds.</li>
+    <li><b>bb_spm_oob</b> - At least one value of the <i>'bb_spm'</i> spectrum is out of bounds.</li>
+    <li><b>a_pig_oob</b> - At least one value of the <i>'a_pig'</i> spectrum is out of bounds.</li>
+    <li><b>a_ys_oob</b> - At least one value of the <i>'a_ys'</i> spectrum is out of bounds.</li>
+</ul>
+
+
+<h3>Further Information</h3>
+
+<p><a href="QaaAlgorithmSpecification.html">QAA Algorithm Specification </a></p>
+
+<p><a href="QaaProcessorDescription.html">QAA Processor Documentation</a></p>
+<br>
+<hr>
+</body>
+</html>
