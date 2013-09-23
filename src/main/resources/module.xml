@@ -21,6 +21,7 @@
     <changelog>
         <![CDATA[
         Changes in 1.3:<br/>
+        [QAA-15] Update limits of the output variables<br/>
         [QAA-13] Update help pages<br/>
         [QAA-12] Change invalid pixel expression to valid pixel expression<br/>
         [QAA-11] Exponent in preparation step should be -3.19<br/>

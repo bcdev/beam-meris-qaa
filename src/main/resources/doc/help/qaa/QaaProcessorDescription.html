@@ -90,7 +90,7 @@
 </p>
 
 <p class="i1">
-    <b>'A_TOTAL' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.02) the flag
+    <b>'A_TOTAL' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: 0.001) the flag
     '<i>a_total_oob</i>' is set and the "No-Data" value is written to the target product instead.
 </p>
 
@@ -100,17 +100,17 @@
 </p>
 
 <p class="i1">
-    <b>'BB_SPM' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.2) the flag
+    <b>'BB_SPM' lower bound:</b> The lower bound of the valid value range. If the computed value is below this boundary (default: 0.0001) the flag
     '<i>bb_spm_oob</i>' is set and the "No-Data" value is written to the target product instead.
 </p>
 
 <p class="i1">
-    <b>'BB_SPM' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 5.0) the flag
+    <b>'BB_SPM' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 1.0) the flag
     '<i>bb_spm_oob</i>' is set and the "No-Data" value is written to the target product instead.
 </p>
 
 <p class="i1">
-    <b>'A_PIG' lower bound</b> The lower bound of the valid value range. If the computed value is below this boundary (default: -0.02) the flag
+    <b>'A_PIG' lower bound</b> The lower bound of the valid value range. If the computed value is below this boundary (default: 0.0001) the flag
     '<i>a_pig_oob</i>' is set and the "No-Data" value is written to the target product instead.
 </p>
 
@@ -120,10 +120,14 @@
 </p>
 
 <p class="i1">
-    <b>'A_YS' upper bound:</b> The upper bound (default: 1.0) of the valid value range. The lower bound is always 0. If the computed value is above or
-    below one
-    of these boundaries the flag '<i>a_ys_oob</i>' is set and the "No-Data" value is written to the target product instead. If the value is below zero
+    <b>'A_YS' lower bound</b> The lower bound of the valid value range. If the computed value is below this boundary (default: 0.0001) the flag
+    '<i>a_ya_oob</i>' is set and the "No-Data" value is written to the target product instead. If the value is below zero
     additionally the flag '<i>negative_a_ys</i>' is set.
+</p>
+
+<p class="i1">
+    <b>'A_YS' upper bound:</b> The upper bound of the valid value range. If the computed value is above this boundary (default: 3.0) the flag
+    '<i>a_ys_oob</i>' is set and the "No-Data" value is written to the target product instead.
 </p>
 
 <p class="i1">

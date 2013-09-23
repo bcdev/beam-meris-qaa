@@ -75,27 +75,35 @@ public class QaaOp extends PixelOperator {
     @Parameter(description = "Deprecated parameter. Use 'validPixelExpression' instead.")
     String invalidPixelExpression;
 
-    @Parameter(defaultValue = "-0.02", label = "'A_TOTAL' lower bound",
+    @Parameter(defaultValue = "0.001", label = "'A_TOTAL' lower bound",
                description = "The lower bound of the valid value range.")
     private float aTotalLower;
     @Parameter(defaultValue = "5.0", label = "'A_TOTAL' upper bound",
                description = "The upper bound of the valid value range.")
     private float aTotalUpper;
-    @Parameter(defaultValue = "-0.2", label = "'BB_SPM' lower bound",
+
+    @Parameter(defaultValue = "0.0001", label = "'BB_SPM' lower bound",
                description = "The lower bound of the valid value range.")
     private float bbSpmLower;
-    @Parameter(defaultValue = "5.0", label = "'BB_SPM' upper bound",
+    @Parameter(defaultValue = "1.0", label = "'BB_SPM' upper bound",
                description = "The upper bound of the valid value range.")
     private float bbSpmUpper;
-    @Parameter(defaultValue = "-0.02", label = "'A_PIG' lower bound",
+
+    @Parameter(defaultValue = "0.0001", label = "'A_PIG' lower bound",
                description = "The lower bound of the valid value range.")
     private float aPigLower;
     @Parameter(defaultValue = "3.0", label = "'A_PIG' upper bound",
                description = "The upper bound of the valid value range.")
     private float aPigUpper;
+
+    @Parameter(defaultValue = "0.0001", label = "'A_YS' upper bound",
+               description = "The lower bound of the valid value range.")
+    private float aYsLower;
+
     @Parameter(defaultValue = "1.0", label = "'A_YS' upper bound",
-               description = "The upper bound of the valid value range. The lower bound is always 0.")
+               description = "The upper bound of the valid value range")
     private float aYsUpper;
+
     @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)",
                description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
@@ -130,7 +138,7 @@ public class QaaOp extends PixelOperator {
         config.setAPigUpper(aPigUpper);
         config.setATotalLower(aTotalLower);
         config.setATotalUpper(aTotalUpper);
-        config.setAYsLower(0.0f);
+        config.setAYsLower(aYsLower);
         config.setAYsUpper(aYsUpper);
         config.setBbSpmsLower(bbSpmLower);
         config.setBbSpmsUpper(bbSpmUpper);
