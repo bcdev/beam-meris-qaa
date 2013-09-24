@@ -10,7 +10,6 @@ class Qaa {
     // private static final int IDX_620 = 5; // 620nm
     private static final int IDX_670 = 6; // 665nm
     private static final double[] acoefs = {-1.273, -1.163, -0.295};
-    private static final int nathan_test = 0;
 
     private final float noDataValue;
 
