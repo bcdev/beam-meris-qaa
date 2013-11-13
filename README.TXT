@@ -1,5 +1,5 @@
 
-Quasi-Analytical Processor (QAA) v1.3, Oct 08, 2013
+Quasi-Analytical Processor (QAA) v1.3.1, Nov 13, 2013
 
 
 Installation
