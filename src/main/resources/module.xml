@@ -1,9 +1,9 @@
 <module>
     <manifestVersion>1.0.0</manifestVersion>
 
-    <symbolicName>beam-meris-qaa</symbolicName>
-    <name>QAA IOP Processor</name>
-    <version>1.3</version>
+    <symbolicName>beam-meris-waterClarity</symbolicName>
+    <name>Water Clarity</name>
+    <version>1.1</version>
 
     <description>
         <![CDATA[
@@ -20,17 +20,7 @@
 
     <changelog>
         <![CDATA[
-        Changes in 1.3:<br/>
-        [QAA-15] Update limits of the output variables<br/>
-        [QAA-13] Update help pages<br/>
-        [QAA-12] Change invalid pixel expression to valid pixel expression<br/>
-        [QAA-11] Exponent in preparation step should be -3.19<br/>
-        Changes in 1.2:<br/>
-        [QAA-010] Extract algorithm class that allows processing on input reflectance vector<br/>
         Changes in 1.1:<br/>
-        [QAA-009] Rename IOPs in user interface according to the resulting band names<br/>
-        [QAA-008] Introduce flags to indicate values which are out of bounds<br/>
-        [QAA-007] Change no-data value to Float.NaN<br/>
         [QAA-006] Don't test source product for specific type<br/>
         [QAA-005] Let user specify expression used for detection of invalid pixels<br/>
         Changes in 1.0.2:<br/>
@@ -62,11 +52,11 @@
 
     <extension point="beam-ui:actions">
         <action>
-            <id>merisQaaIOP</id>
-            <class>org.esa.beam.meris.qaa.ui.MerisQaaAction</class>
-            <text>QAA for IOP (MERIS)...</text>
-            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
-            <mnemonic>Q</mnemonic>
+            <id>merisWaterClarity</id>
+            <class>org.esa.beam.meris.waterclarity.ui.MerisQaaAction</class>
+            <text>Water Clarity (MERIS)...</text>
+            <shortDescr>Water Clarity</shortDescr>
+            <mnemonic>W</mnemonic>
             <parent>tools</parent>
             <helpId>QAATool</helpId>
             <placeAfter>flhMciScientificTool</placeAfter>
@@ -76,7 +66,7 @@
     <extension point="beam-ui:helpSets">
         <helpSet>
             <parent>beam-help</parent>
-            <path>doc/help/qaa.hs</path>
+            <path>doc/help/qaa_v4.hs</path>
         </helpSet>
     </extension>
 </module>
