@@ -38,7 +38,7 @@ public class Qaa {
         float bbp560;
         float rat;
         float Y;
-        float[] u = new float[Rrs.length - 1]; //Band 7 is only used once
+        float[] u = new float[Rrs.length]; //Band 7 is only used once
 
         // step 0.1 prepare Rrs670
         float Rrs670_upper;
