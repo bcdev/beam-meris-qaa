@@ -51,6 +51,16 @@ public class QaaForm extends JTabbedPane {
         this.targetProductSelector = targetProductSelector;
         ioParametersPanel = createIOParameterPanel(appContext, operatorSpi, this.targetProductSelector);
 
+
+        /*
+        *  Added this listener to check when the "Derive Water Clarity" check box
+        *  changes. It starts checked/unchecked, the listener will get the new value
+        *  and append the appropriate ending to the target product.
+        *
+        *  note: the "runWC" part is the variable used for the check box parameter in QaaOp
+        *
+        *  n.guggenberger and m.peters on Mar-26-14
+        */
         propertySet.addPropertyChangeListener("runWC", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -106,7 +116,8 @@ public class QaaForm extends JTabbedPane {
             }
             final TargetProductSelectorModel targetProductSelectorModel = targetProductSelector.getModel();
 
-            //QaaOp QaaOp = new QaaOp();
+            // by default selected is false, but I created an if for both in case someone in
+            // the future changes the default.
             if(selected){
                 TARGET_PRODUCT_NAME_SUFFIX = "_waterClarity";
             } else {
