@@ -60,7 +60,7 @@ public class Qaa {
 
         //STEP 1 ///////////////////////////////////////////////////////////////////////////////////////////////
         for (int b = 0; b < Rrs.length; b++) { //Modified by MZ, Nov-05-11
-            double nom = Math.pow(g0, 2.0) + 4.0 * g0 * g1 * rrs[b];
+            double nom = Math.pow(g0, 2.0) + 4.0 * g1 * rrs[b]; //Removed the second g0 (n.guggenberger Mar-26-14)
             if (nom >= 0) {
                 u[b] = (float) ((Math.sqrt(nom) - g0) / (2.0 * g1));
             } else {
