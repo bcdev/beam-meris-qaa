@@ -37,8 +37,8 @@ import java.util.logging.Logger;
 @OperatorMetadata(alias = "Meris.QaaIOP",
         description = "Performs retrieval of inherent optical properties (IOPs) for " +
                 "coastal and open ocean waters for MERIS.",
-        authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
-        copyright = "(C) 2013 by NRL and WSU",
+        authors = "Zhongping Lee (University of Massachusetts Boston), Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
+        copyright = "(C) 2014 by NRL and WSU",
         version = "1.3.1")
 public class QaaOp extends PixelOperator {
 
@@ -111,6 +111,14 @@ public class QaaOp extends PixelOperator {
             description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
+
+    /*
+    *   The next two parameters are for water clarity. The runWC is an important part
+    *   due to it being used throughout the entire program to only run the selected plugin.
+    *
+    *
+    *   n.guggenberger Mar-26-14
+    */
     @Parameter(defaultValue = "1", label = "Water Clarity 1%, 10%, 50%",
             description = "Water Clarity 1%, 10%, 50%. Input integer")
     private int waterClari;
@@ -125,6 +133,10 @@ public class QaaOp extends PixelOperator {
     private ThreadLocal<QaaResult> qaaResult;
     private Qaa qaa;
 
+
+    /*
+    *   Getters and Setters for the runWC variable. Allowing access to variable when instantiated.
+    */
     public boolean getRunWC() {
         return this.runWC;
     }
@@ -170,6 +182,9 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void configureTargetProduct(ProductConfigurer configurer) {
         super.configureTargetProduct(configurer);
+
+        //  First of many uses of the if(runWC) or if (!runWC) to determine if that segment needs
+        //  to be ran or not.       n.guggenberger Mar-26-14
         if (!runWC){
             for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
                 addBand(configurer, A_TOTAL_PATTERN, QaaConstants.WAVELENGTH[i],
