@@ -22,5 +22,5 @@ Credits
 
 The QAA BEAM module has been developed by the U.S. Naval Research Center and Winona 
 State University:
-- Prof. Zhongping Lee - QAA algorithm 
-- Prof. Mingrui Zhang - QAA BEAM module coding
+- Prof. Zhongping Lee (University of Massachusetts Boston) - QAA algorithm
+- Prof. Mingrui Zhang (Winona State University) - QAA BEAM module coding
