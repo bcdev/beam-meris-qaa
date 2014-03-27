@@ -19,7 +19,7 @@ public class MerisQaaAction extends AbstractVisatAction {
         final OperatorMetadata opMetadata = QaaOp.class.getAnnotation(OperatorMetadata.class);
         Command command = event.getCommand();
         final QaaDialog operatorDialog = new QaaDialog(opMetadata.alias(), getAppContext(),
-                                                        "Water Clarity", command.getHelpId());
+                                                        "QAA for IOP", command.getHelpId());
         operatorDialog.getJDialog().pack();
         operatorDialog.show();
 
