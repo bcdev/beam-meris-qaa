@@ -2,7 +2,7 @@ package org.esa.beam.meris.qaa.algorithm;
 
 public class Qaa {
 
-    private static final int IDX_410 = 0; // 415.5nm
+    private static final int IDX_410 = 0; // 412.5nm
     private static final int IDX_440 = 1; // 442.5nm
     private static final int IDX_490 = 2; // 490nm
     // private static final int IDX_510 = 3; // 510nm
