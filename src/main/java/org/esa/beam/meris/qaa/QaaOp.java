@@ -263,7 +263,8 @@ public class QaaOp extends PixelOperator {
             sampleConfigurer.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
         if (runWC){
-            sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_AZIMUTH_DS_NAME); //Y. Jiang
+            //sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_AZIMUTH_DS_NAME); //Y. Jiang
+            sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_ZENITH_DS_NAME); //N. Guggenberger
         }
     }
 
@@ -298,7 +299,7 @@ public class QaaOp extends PixelOperator {
                 }
             }
             if (!runWC){
-                result = qaaAlgorithm.process(rrs, result);
+                result = qaaAlgorithm.process(rrs, result, x, y);
             }
             if (runWC){
                 try {
@@ -313,9 +314,7 @@ public class QaaOp extends PixelOperator {
                      */
                     // steps 0-6
                     // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-
-                    qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel);
-
+                    qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel,x,y);
                     // steps 7-10
                     qaa.qaaf_decomp(rrs_pixel, a_pixel, aph_pixel, adg_pixel);
 
@@ -324,22 +323,24 @@ public class QaaOp extends PixelOperator {
 
                     int IDX_490 = 2;
                     float a=0;
-                    for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
-                        a = (float) Qaa.AW_COEFS[i] + aph_pixel[i] + adg_pixel[i];
-                        a = checkAgainstBounds(a, aTotalLower, aTotalUpper);
-                        //                   targetSamples[A_INDEXES[i]].set(a);
-                        if(QaaConstants.A_TOTAL_BAND_INDEXES[i]==IDX_490) break;
-                    }
+                    a = 0;
+                    a = (float) Qaa.AW_COEFS[IDX_490] + aph_pixel[IDX_490] + adg_pixel[IDX_490];
+                    a = checkAgainstBounds(a, aTotalLower, aTotalUpper);
+                    // targetSamples[A_INDEXES[i]].set(a);
+
                     float bb=0;
-                    for (int i = 0; i < QaaConstants.BB_SPM_BAND_INDEXES.length; i++) {
-                        bb = (float) Qaa.BBW_COEFS[i] + bbp_pixel[i];
-                        bb = checkAgainstBounds(bb, bbSpmLower, bbSpmUpper);
-                        // targetSamples[BB_INDEXES[i]].set(bb);
-                        if(QaaConstants.BB_SPM_BAND_INDEXES[i]==7) break;
-                    }
+                    bb = (float) Qaa.BBW_COEFS[IDX_490] + bbp_pixel[IDX_490];
+                    bb = checkAgainstBounds(bb, bbSpmLower, bbSpmUpper);
 
+//                    if (((x == 135) && (y == 1255)))     {
+//                        System.out.println("-------------------------------------------------------------------" +
+//                                "\n x:    " + x + "\ny:    " + y );
+//                        System.out.println("a490: " + a);
+//                        System.out.println("bb_490: " + bb);
+//
+//                    }
 
-                    float z = qaa.qaaf_zeu(a,bb,sourceSamples[7].getFloat(),waterClari);
+                    float z = qaa.qaaf_zeu(a,bb,sourceSamples[7].getFloat(),waterClari,x,y);
                     for(int i=0;i< WC_INDEXES.length;i++)
                         if(z>0)
                             targetSamples[WC_INDEXES[0]].set(z);       //y.jiang

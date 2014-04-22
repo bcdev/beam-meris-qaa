@@ -36,7 +36,7 @@ public class QaaAlgorithm {
      *
      * @return the computation result
      */
-    public QaaResult process(float[] rrs_in, QaaResult recycle) {
+    public QaaResult process(float[] rrs_in, QaaResult recycle, int pixx, int pixy) {
         QaaResult result = ensureResult(recycle);
 
         try {
@@ -61,7 +61,7 @@ public class QaaAlgorithm {
              */
             // steps 0-6
             // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-            qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel);
+            qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbSpm_pixel,pixx,pixy);
 
             // steps 7-10
             qaa.qaaf_decomp(rrs_pixel, a_pixel, aPig_pixel, aYs_pixel);
@@ -70,7 +70,7 @@ public class QaaAlgorithm {
             result.setValid(true);
 
             result = computeATotal(aPig_pixel, aYs_pixel, result);
-            result = computeBbSpm(bbSpm_pixel, result);
+            result = computeBbSpm(bbSpm_pixel, result, pixx, pixy);
             result = computeAPig(aPig_pixel, result);
             result = computeAYs(aYs_pixel, result);
         } catch (ImaginaryNumberException ignore) {
@@ -106,9 +106,14 @@ public class QaaAlgorithm {
         return qaaResult;
     }
 
-    private QaaResult computeBbSpm(float[] bbSpm_pixel, QaaResult qaaResult) {
+    private QaaResult computeBbSpm(float[] bbSpm_pixel, QaaResult qaaResult, int x, int y) {
         for (int i = 0; i < QaaConstants.NUM_BB_SPM_BANDS; i++) {
             float bbSpm = (float) QaaConstants.BBW_COEFS[i] + bbSpm_pixel[i];
+            if (((x == 447) && (y == 1409)) && i == 2) {
+                System.out.println("BBW_COEFS[4]: " + QaaConstants.BBW_COEFS[i]);
+                System.out.println("bbSpm_Pixle: " + bbSpm_pixel[i]);
+                System.out.println("BBSPM: " + bbSpm);
+            }
             boolean isOob = isOutOfBounds(bbSpm, config.getBbSpmsLower(), config.getBbSpmsUpper());
             if (isOob) {
                 // @todo 2 tb/tb case not covered by tests tb 2013-02-25
