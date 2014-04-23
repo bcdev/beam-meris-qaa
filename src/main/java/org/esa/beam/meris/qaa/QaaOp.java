@@ -263,8 +263,7 @@ public class QaaOp extends PixelOperator {
             sampleConfigurer.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
         if (runWC){
-            //sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_AZIMUTH_DS_NAME); //Y. Jiang
-            sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_ZENITH_DS_NAME); //N. Guggenberger
+            sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_ZENITH_DS_NAME); //changed April-23-2014 N. Guggenberger
         }
     }
 
@@ -299,7 +298,7 @@ public class QaaOp extends PixelOperator {
                 }
             }
             if (!runWC){
-                result = qaaAlgorithm.process(rrs, result, x, y);
+                result = qaaAlgorithm.process(rrs, result);
             }
             if (runWC){
                 try {
@@ -314,7 +313,7 @@ public class QaaOp extends PixelOperator {
                      */
                     // steps 0-6
                     // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-                    qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel,x,y);
+                    qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel);
                     // steps 7-10
                     qaa.qaaf_decomp(rrs_pixel, a_pixel, aph_pixel, adg_pixel);
 
@@ -332,15 +331,8 @@ public class QaaOp extends PixelOperator {
                     bb = (float) Qaa.BBW_COEFS[IDX_490] + bbp_pixel[IDX_490];
                     bb = checkAgainstBounds(bb, bbSpmLower, bbSpmUpper);
 
-//                    if (((x == 135) && (y == 1255)))     {
-//                        System.out.println("-------------------------------------------------------------------" +
-//                                "\n x:    " + x + "\ny:    " + y );
-//                        System.out.println("a490: " + a);
-//                        System.out.println("bb_490: " + bb);
-//
-//                    }
 
-                    float z = qaa.qaaf_zeu(a,bb,sourceSamples[7].getFloat(),waterClari,x,y);
+                    float z = qaa.qaaf_zeu(a,bb,sourceSamples[7].getFloat(),waterClari); //remove x,y from params
                     for(int i=0;i< WC_INDEXES.length;i++)
                         if(z>0)
                             targetSamples[WC_INDEXES[0]].set(z);       //y.jiang

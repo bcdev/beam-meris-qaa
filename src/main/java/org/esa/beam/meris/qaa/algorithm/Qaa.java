@@ -28,7 +28,7 @@ public class Qaa {
         this.noDataValue = noDataValue;
     }
 
-    public void qaaf_v5(float[] Rrs, float[] rrs, float[] a, float[] bbp, int pixx, int pixy) throws org.esa.beam.meris.qaa.ImaginaryNumberException {
+    public void qaaf_v5(float[] Rrs, float[] rrs, float[] a, float[] bbp) throws org.esa.beam.meris.qaa.ImaginaryNumberException {
         // QAA constants from C version of QAA v5.
         final double g0 = 0.08945;
         final double g1 = 0.1245;
@@ -49,7 +49,7 @@ public class Qaa {
 
         // if Rrs[670] out of bounds, reassign its value by QAA v5.
         if (Rrs[IDX_670] > Rrs670_upper || Rrs[IDX_670] < Rrs670_lower || Rrs[IDX_670] == noDataValue) {
-            float Rrs670 = (float) (0.00018 * Math.pow(Rrs[IDX_490] / Rrs[IDX_560], -3.19));                  /////////////////ERROR -- there is a neg at 3.19
+            float Rrs670 = (float) (0.00018 * Math.pow(Rrs[IDX_490] / Rrs[IDX_560], -3.19));
             Rrs670 += (float) (1.27 * Math.pow(Rrs[IDX_560], 1.47));
             Rrs[IDX_670] = Rrs670;
         }
@@ -85,9 +85,7 @@ public class Qaa {
             }
             rho = (float) Math.log10(result);
             rho = (float) (acoefs[0] + acoefs[1] * rho + acoefs[2] * Math.pow(rho, 2.0));
-            if ((pixx == 447) && (pixy == 1409)) {
-                System.out.println("h0: " + acoefs[0] + "\nh1: " + acoefs[1] + "\n h2: " + acoefs[2]);
-            }
+
             a560 = (float) (QaaConstants.AW_COEFS[IDX_560] + Math.pow(10.0, rho));
             /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -164,7 +162,7 @@ public class Qaa {
 
         //STEP 8 ////////////////////////////////////////////////////////////////////////////////////////////////
         double S = 0.015 + 0.002 / (0.6 + rat); // new in QAA v5
-        zeta = (float) Math.exp(S * (QaaConstants.WAVELENGTH[IDX_440] - QaaConstants.WAVELENGTH[IDX_410]));                 //change 410 to 560 maybe????????????
+        zeta = (float) Math.exp(S * (QaaConstants.WAVELENGTH[IDX_440] - QaaConstants.WAVELENGTH[IDX_410]));
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //STEP 9 & 10 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -176,13 +174,13 @@ public class Qaa {
         for (int b = 0; b < rrs.length - 1; b++) {
             adg[b] = (float) (ag440 * Math.exp(
                     -1 * S * (QaaConstants.WAVELENGTH[b] - QaaConstants.WAVELENGTH[IDX_440])));
-            aph[b] = (float) (a[b] - adg[b] - QaaConstants.AW_COEFS[b]);                                                     //look at AW 443. Shouldn't be 'b'?
+            aph[b] = (float) (a[b] - adg[b] - QaaConstants.AW_COEFS[b]);
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     }
 
-    public float qaaf_zeu(float alpha490, float bb490, float theta,int waterClar, int pixx, int pixy) throws org.esa.beam.meris.qaa.ImaginaryNumberException { //y.jiang
+    public float qaaf_zeu(float alpha490, float bb490, float theta,int waterClar) throws org.esa.beam.meris.qaa.ImaginaryNumberException { //y.jiang
 
         //Values of model parameters
         float  x0 = (float) -0.057;
@@ -204,14 +202,11 @@ public class Qaa {
         //   float bb490  = bb[IDX_490];      y.jiang
         if(bb490 < 0.0016) bb490 = (float) 0.0016;
 
-        //
         double K1 = (   (x0 + x1*Math.sqrt(alpha490) + x2*(bb490)) *          //changed Feb-22-2012 Y.Jiang
-                (1 + a0 * Math.sin(theta*3.1416/180))  );
-       // double K2 = (   (zt0 + zt1*Math.sqrt(alpha490) + zt2*(bb490)) *       //Original
-               // (a1 + a2 * Math.cos(theta))  );
+                (1 + a0 * Math.sin(theta*(Math.PI/180))));                    //changed April-23-2014 N.Guggenberger
 
-        double K2 = (   (zt0 + zt1*alpha490 + zt2*(bb490)) *         //SQRT Removed
-                (a1 + a2 * Math.cos(theta*3.1416/180))  );
+        double K2 = (   (zt0 + zt1*alpha490 + zt2*(bb490)) *         //SQRT Removed April-23-2014 N.Guggenberger
+                (a1 + a2 * Math.cos(theta*(Math.PI/180))));         //changed April-23-2014 N.Guggenberger
 
         //
         float[] water = new float[] {   (float) (4.605),
@@ -244,14 +239,6 @@ public class Qaa {
         if(Q<0) throw new org.esa.beam.meris.qaa.ImaginaryNumberException("Q<0",Q);
         double x= Math.acos(R/Math.pow(Q*Q*Q,0.5));
         float z = (float) (-2*Math.pow(Q,0.5)*Math.cos((x-2*Math.PI)/3)-y1/3);
-
-        if (((pixx == 135) && (pixy == 1255)))     {
-            System.out.println("-------------------------------------------------------------------" +
-              "\n x:    " + pixx + "\ny:    " + pixy + "\na490: " + alpha490 + "\nbb490:    " + bb490 + "\nK1:      " + K1 + "\nK2:     " + K2);
-            System.out.println("\ny1:   " + y1 + "\ny2:     " + y2 + "\ny3:     " + y3);
-            System.out.println("\nQ:    " + Q + "\nR:   " + R);
-            System.out.println("\nX:    " + x + "\nZ:   " + z + "\n------------------------------------------------------");
-        }
 
         return z;
     }
