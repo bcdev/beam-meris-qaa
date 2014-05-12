@@ -1,5 +1,5 @@
 
-Quasi-Analytical Processor (QAA) v1.3.1, Nov 13, 2013
+Quasi-Analytical Processor (QAA) for MERIS v1.3.2, May 14, 2014
 
 
 Installation
@@ -8,7 +8,7 @@ Installation
 To install QAA, place the QAA jar file into the modules folder located wherever 
 BEAM was installed. QAA will now be available next time Beam-Visat is started.  
 
-Note: If BEAM-Visat is already running, it will have to be restarted before QAA will 
+Note: If BEAM VISAT is already running, it will have to be restarted before QAA will
 be available for use.
 
 License

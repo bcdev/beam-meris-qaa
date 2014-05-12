@@ -41,7 +41,7 @@ import java.util.logging.Logger;
                                 "coastal and open ocean waters for MERIS.",
                   authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
                   copyright = "(C) 2013 by NRL and WSU",
-                  version = "1.3.1")
+                  version = "1.3.2")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
@@ -78,6 +78,7 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "0.001", label = "'A_TOTAL' lower bound",
                description = "The lower bound of the valid value range.")
     private float aTotalLower;
+
     @Parameter(defaultValue = "5.0", label = "'A_TOTAL' upper bound",
                description = "The upper bound of the valid value range.")
     private float aTotalUpper;
@@ -85,6 +86,7 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "0.0001", label = "'BB_SPM' lower bound",
                description = "The lower bound of the valid value range.")
     private float bbSpmLower;
+
     @Parameter(defaultValue = "1.0", label = "'BB_SPM' upper bound",
                description = "The upper bound of the valid value range.")
     private float bbSpmUpper;
@@ -92,6 +94,7 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "0.0001", label = "'A_PIG' lower bound",
                description = "The lower bound of the valid value range.")
     private float aPigLower;
+
     @Parameter(defaultValue = "3.0", label = "'A_PIG' upper bound",
                description = "The upper bound of the valid value range.")
     private float aPigUpper;
