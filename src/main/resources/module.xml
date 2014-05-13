@@ -69,8 +69,8 @@
             <parent>processing.thematicWater</parent>
             <id>merisQaaIOP</id>
             <class>org.esa.beam.meris.qaa.ui.MerisQaaAction</class>
-            <text>QAA for IOP (MERIS)...</text>
-            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
+            <text>MERIS QAA IOPs...</text>
+            <shortDescr>Computes MERIS QAA Inherent Optical Properties (IOPs)</shortDescr>
             <mnemonic>Q</mnemonic>
             <helpId>QAATool</helpId>
             <placeAfter>flhMciScientificTool</placeAfter>
