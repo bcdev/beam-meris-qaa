@@ -5,8 +5,8 @@
 
 <map version="2.0">
 
-    <mapID target="QAATool" url="QAA_v4/QAATool.html"/>
-    <mapID target="QAASpec" url="QAA_v4/QAASpec.html"/>
-    <mapID target="QAAProcessorDesc" url="QAA_v4/QAAProcessorDescription.html"/>
+    <mapID target="QAATool" url="QAA/QAATool.html"/>
+    <mapID target="QAASpec" url="QAA/QAASpec.html"/>
+    <mapID target="QAAProcessorDesc" url="QAA/QAAProcessorDescription.html"/>
 
 </map>

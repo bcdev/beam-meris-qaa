@@ -2,8 +2,8 @@
     <manifestVersion>1.0.0</manifestVersion>
 
     <symbolicName>beam-meris-qaa</symbolicName>
-    <name>Qaa IOP Processor</name>
-    <version>1.3.1</version>
+    <name>QAA IOP Processor</name>
+    <version>1.4</version>
 
     <description>
         <![CDATA[
@@ -20,6 +20,8 @@
 
     <changelog>
         <![CDATA[
+        Changes in 1.3.2:<br/>
+        Minor change for BEAM 5, no algorithm changes.<br/>
         Changes in 1.3.1:<br/>
         [QAA-16] Make AW_COEFS and BBW_COEFS of QaaConstants public available<br/>
         Changes in 1.3:<br/>
@@ -64,21 +66,20 @@
 
     <extension point="beam-ui:actions">
         <action>
-            <id>merisqAAiop</id>
+            <parent>processing.thematicWater</parent>
+            <id>merisQaaIOP</id>
             <class>org.esa.beam.meris.qaa.ui.MerisQaaAction</class>
-            <text>QAA for IOP (MERIS)...</text>
-            <shortDescr>Invoke the QAA for IOP processor</shortDescr>
+            <text>MERIS QAA IOPs...</text>
+            <shortDescr>Computes MERIS QAA Inherent Optical Properties (IOPs)</shortDescr>
             <mnemonic>Q</mnemonic>
-            <parent>tools</parent>
             <helpId>QAATool</helpId>
-            <placeAfter>flhMciScientificTool</placeAfter>
         </action>
     </extension>
 
     <extension point="beam-ui:helpSets">
         <helpSet>
             <parent>beam-help</parent>
-            <path>doc/help/qaa_v4.hs</path>
+            <path>doc/help/qaa.hs</path>
         </helpSet>
     </extension>
 </module>

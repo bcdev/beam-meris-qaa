@@ -4,7 +4,7 @@
         "http://java.sun.com/products/javahelp/helpset_2_0.dtd">
 
 <helpset version="2.0">
-    <title>QAA_v4 Processor Help</title>
+    <title>QAA Processor Help</title>
     <maps>
         <homeID>top</homeID>
         <mapref location="map.jhm"/>
