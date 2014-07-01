@@ -2,8 +2,8 @@
     <manifestVersion>1.0.0</manifestVersion>
 
     <symbolicName>beam-meris-qaa</symbolicName>
-    <name>MERIS QAA IOP Processor</name>
-    <version>1.3.2</version>
+    <name>QAA IOP Processor</name>
+    <version>1.4</version>
 
     <description>
         <![CDATA[

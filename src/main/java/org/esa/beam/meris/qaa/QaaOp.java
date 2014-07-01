@@ -41,7 +41,7 @@ import java.util.logging.Logger;
                                 "coastal and open ocean waters for MERIS.",
                   authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
                   copyright = "(C) 2013 by NRL and WSU",
-                  version = "1.3.2")
+                  version = "1.4")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
