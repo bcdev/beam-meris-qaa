@@ -12,8 +12,10 @@
 
             <p>Documentation:</p>
             <ul>
-                <li><a href="http://github.com/downloads/bcdev/beam-meris-qaa/Lee_2002_QAA.pdf">Processor Documentation (Journal paper)</a></li>
-                <li><a href="http://github.com/downloads/bcdev/beam-meris-qaa/QAA_v5.pdf">update to the documentation paper</a></li>
+                <li><a href="http://org.esa.beam.s3.amazonaws.com/docs/beam/beam-meris-qaa/Lee_2002_QAA.pdf">Documentation of the Quasi-Analytical Algorithm (QAA)</a></li>
+                <li><a href="http://org.esa.beam.s3.amazonaws.com/docs/beam/beam-meris-qaa/QAA_v5.pdf">update to the documentation paper</a></li>
+                <li><a href="http://org.esa.beam.s3.amazonaws.com/docs/beam/beam-meris-qaa/QAA_v6_Zeu.pdf">further update including water clarity</a></li>
+                <li><a href="http://org.esa.beam.s3.amazonaws.com/docs/beam/beam-meris-qaa/Leeetal_2013_Kd.pdf">Penetration of UV-visible solar radiation in the global oceans:</a></li>
             </ul>
         ]]>
     </description>
