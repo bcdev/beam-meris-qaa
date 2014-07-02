@@ -1,6 +1,5 @@
 package org.esa.beam.meris.qaa.ui;
 
-import com.bc.ceres.binding.Property;
 import com.bc.ceres.binding.PropertySet;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.GPF;
@@ -32,12 +31,7 @@ class QaaDialog extends SingleTargetProductDialog {
         OperatorDescriptor operatorDescriptor = operatorSpi.getOperatorDescriptor();
 
         parameterSupport = new OperatorParameterSupport(operatorDescriptor);
-        parameterSupport.getParameterMap().remove("invalidPixelExpression");
         final PropertySet propertySet = parameterSupport.getPropertySet();
-        final Property invalidPixelExpressionProperty = propertySet.getProperty("invalidPixelExpression");
-        if (invalidPixelExpressionProperty != null) {
-            propertySet.removeProperty(invalidPixelExpressionProperty);
-        }
         form = new QaaForm(appContext, operatorSpi, propertySet, getTargetProductSelector());
         OperatorMenu operatorMenu = new OperatorMenu(this.getJDialog(),
                                                      operatorDescriptor,

@@ -32,6 +32,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 /**
@@ -44,11 +46,40 @@ public class QaaForm extends JTabbedPane {
 
     private DefaultIOParametersPanel ioParametersPanel;
     private TargetProductSelector targetProductSelector;
+    boolean selected = false;
+    String productName = "";
 
     public QaaForm(AppContext appContext, OperatorSpi operatorSpi, PropertySet propertySet,
-                   TargetProductSelector targetProductSelector) {
+                   final TargetProductSelector targetProductSelector) {
         this.targetProductSelector = targetProductSelector;
         ioParametersPanel = createIOParameterPanel(appContext, operatorSpi, this.targetProductSelector);
+
+
+        /*
+        *  Added this listener to check when the "Derive Water Clarity" check box
+        *  changes. It starts checked/unchecked, the listener will get the new value
+        *  and append the appropriate ending to the target product.
+        *
+        *  note: the "runWC" part is the variable used for the check box parameter in QaaOp
+        *
+        *  n.guggenberger and m.peters on Mar-26-14
+        */
+        propertySet.addPropertyChangeListener("runWC", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                selected = (Boolean) evt.getNewValue();
+                TargetProductSelectorModel model = targetProductSelector.getModel();
+
+                String TARGET_PRODUCT_NAME_SUFFIX;
+                if (selected) {
+                    TARGET_PRODUCT_NAME_SUFFIX = "_waterClarity";
+                } else {
+                    TARGET_PRODUCT_NAME_SUFFIX = "_qaa";
+                }
+
+                model.setProductName(productName + TARGET_PRODUCT_NAME_SUFFIX);
+            }
+        });
 
         JScrollPane parametersPanel = createParametersPanel(appContext, propertySet);
         addTab("I/O Parameters", ioParametersPanel);
@@ -77,16 +108,25 @@ public class QaaForm extends JTabbedPane {
 
     private class SourceProductChangeListener extends AbstractSelectionChangeListener {
 
-        private static final String TARGET_PRODUCT_NAME_SUFFIX = "_qaa";
 
         @Override
         public void selectionChanged(SelectionChangeEvent event) {
             final Product selectedProduct = (Product) event.getSelection().getSelectedValue();
-            String productName = "";
+
             if (selectedProduct != null) {
                 productName = FileUtils.getFilenameWithoutExtension(selectedProduct.getName());
             }
             final TargetProductSelectorModel targetProductSelectorModel = targetProductSelector.getModel();
+
+            // by default selected is false, but I created an if for both in case someone in
+            // the future changes the default.
+            String TARGET_PRODUCT_NAME_SUFFIX;
+            if (selected) {
+                TARGET_PRODUCT_NAME_SUFFIX = "_waterClarity";
+            } else {
+                TARGET_PRODUCT_NAME_SUFFIX = "_qaa";
+            }
+
             targetProductSelectorModel.setProductName(productName + TARGET_PRODUCT_NAME_SUFFIX);
 
         }
@@ -152,5 +192,6 @@ public class QaaForm extends JTabbedPane {
         private boolean isSourceProductSelected(ArrayList<SourceProductSelector> srcProductList) {
             return !srcProductList.isEmpty() && srcProductList.get(0).getSelectedProduct() != null;
         }
+
     }
 }

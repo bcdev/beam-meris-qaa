@@ -1,10 +1,10 @@
 package org.esa.beam.meris.qaa.brewin;
 
-import org.esa.beam.meris.qaa.algorithm.ImaginaryNumberException;
+import org.esa.beam.meris.qaa.ImaginaryNumberException;
 import org.esa.beam.meris.qaa.algorithm.QaaResult;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ConfAlgorithmTest {
 
@@ -74,7 +74,14 @@ public class ConfAlgorithmTest {
 
     @Test
     public void testProcess_SeaWiFS() throws ImaginaryNumberException {
-        final float[] rrs_in = {0.00167972470255084f, 0.00186919071018569f, 0.0027188008445359f, 0.00309262196610828f, 0.00406382197640373f, 0.00120514585009823f};
+        final float[] rrs_in = {
+                0.00167972470255084f,
+                0.00186919071018569f,
+                0.0027188008445359f,
+                0.00309262196610828f,
+                0.00406382197640373f,
+                0.00120514585009823f
+        };
 
         final ConfAlgorithm algorithm = new ConfAlgorithm(new SeaWifsConfig());
 

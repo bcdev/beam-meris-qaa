@@ -1,6 +1,6 @@
 package org.esa.beam.meris.qaa.brewin;
 
-import org.esa.beam.meris.qaa.algorithm.ImaginaryNumberException;
+import org.esa.beam.meris.qaa.ImaginaryNumberException;
 import org.esa.beam.meris.qaa.algorithm.QaaResult;
 
 public class ConfAlgorithm {
