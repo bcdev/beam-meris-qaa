@@ -23,6 +23,7 @@ import org.esa.beam.meris.qaa.algorithm.QaaAlgorithm;
 import org.esa.beam.meris.qaa.algorithm.QaaConfig;
 import org.esa.beam.meris.qaa.algorithm.QaaConstants;
 import org.esa.beam.meris.qaa.algorithm.QaaResult;
+import org.esa.beam.meris.qaa.algorithm.WaterClarity;
 
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -106,13 +107,13 @@ public class QaaOp extends PixelOperator {
     *
     *   n.guggenberger Mar-26-14
     */
-    @Parameter(defaultValue = "1", label = "Water Clarity 1%, 10%, 50%",
-               description = "Water Clarity 1%, 10%, 50%. Input integer")
-    private int waterClari;
-
-    @Parameter(defaultValue = "false", label = "Derive Water Clarity?",
+    @Parameter(defaultValue = "false", label = "Derive Water Clarity",
                description = "Choose whether to derive Water Clarity in addition to QAA.")
     private boolean runWC;
+
+    @Parameter(defaultValue = "WATER_CLARITY_1", label = "Water Clarity", unit = "%",
+               description = "Water Clarity 1%, 10%, 50%.")
+    private WaterClarity waterClarity;
 
 
     private VirtualBandOpImage validOpImage;
@@ -195,7 +196,7 @@ public class QaaOp extends PixelOperator {
 
 
         if (runWC) {
-            String bandnameEZ = "Water Clarity_" + waterClari + "%%";
+            String bandnameEZ = "Water Clarity_" + waterClarity + "%%";
             String discriptionEZ = bandnameEZ;
             addBand(configurer, bandnameEZ, 490, discriptionEZ); //y.jiang
         }
@@ -315,7 +316,7 @@ public class QaaOp extends PixelOperator {
                     bb = checkAgainstBounds(bb, bbSpmLower, bbSpmUpper);
 
 
-                    float z = qaa.qaaf_zeu(a, bb, sourceSamples[7].getFloat(), waterClari); //remove x,y from params
+                    float z = qaa.qaaf_zeu(a, bb, sourceSamples[7].getFloat(), waterClarity); //remove x,y from params
                     for (int WC_INDEX : WC_INDEXES) {
                         if (z > 0) {
                             targetSamples[WC_INDEXES[0]].set(z);       //y.jiang

@@ -182,7 +182,7 @@ public class Qaa {
 
     }
 
-    public float qaaf_zeu(float alpha490, float bb490, float theta, int waterClar) throws ImaginaryNumberException { //y.jiang
+    public float qaaf_zeu(float alpha490, float bb490, float theta, WaterClarity waterClarity) throws ImaginaryNumberException { //y.jiang
 
         //Values of model parameters
         float x0 = (float) -0.057;
@@ -214,33 +214,8 @@ public class Qaa {
         double K2 = ((zt0 + zt1 * alpha490 + zt2 * (bb490)) *         //SQRT Removed April-23-2014 N.Guggenberger
                      (a1 + a2 * Math.cos(theta * (Math.PI / 180))));         //changed April-23-2014 N.Guggenberger
 
-        //
-        float[] water = new float[]{
-                (float) (4.605),
-                (float) (2.303),
-                (float) (0.693)
-        };
-        float t;
-        switch (waterClar) {
-            case 1:
-                t = water[0];
-                break;
-            case 10:
-                t = water[1];
-                break;
-            case 50:
-                t = water[2];
-                break;
-            default:
-                t = water[0];
-        }
-
+        float t = waterClarity.getTau();
         double y1, y2, y3;
-        // float z1 = -1; //initialize
-
-        float imaginary = (float) -1;
-
-        // for(int i = 0; i < t.length; i++){
 
         y1 = ((K1 * K1 - K2 * K2 - 2 * (t * K1)) /
               (K1 * K1));
