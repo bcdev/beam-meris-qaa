@@ -317,7 +317,7 @@ public class QaaOp extends PixelOperator {
 
 
                     float z = qaa.qaaf_zeu(a, bb, sourceSamples[7].getFloat(), waterClarity); //remove x,y from params
-                    for (int WC_INDEX : WC_INDEXES) {
+                    for (int i = 0; i < WC_INDEXES.length; i++) {
                         if (z > 0) {
                             targetSamples[WC_INDEXES[0]].set(z);       //y.jiang
                         } else {
