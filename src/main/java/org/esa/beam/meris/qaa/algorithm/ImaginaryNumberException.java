@@ -1,4 +1,4 @@
-package org.esa.beam.meris.qaa;
+package org.esa.beam.meris.qaa.algorithm;
 
 public class ImaginaryNumberException extends Exception {
 

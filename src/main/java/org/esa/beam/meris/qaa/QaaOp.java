@@ -6,6 +6,7 @@ import org.esa.beam.framework.datamodel.FlagCoding;
 import org.esa.beam.framework.datamodel.Mask;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.datamodel.ProductData;
+import org.esa.beam.framework.gpf.Operator;
 import org.esa.beam.framework.gpf.OperatorException;
 import org.esa.beam.framework.gpf.OperatorSpi;
 import org.esa.beam.framework.gpf.annotations.OperatorMetadata;
@@ -18,23 +19,29 @@ import org.esa.beam.framework.gpf.pointop.SampleConfigurer;
 import org.esa.beam.framework.gpf.pointop.WritableSample;
 import org.esa.beam.jai.ResolutionLevel;
 import org.esa.beam.jai.VirtualBandOpImage;
-import org.esa.beam.meris.qaa.algorithm.Qaa;
 import org.esa.beam.meris.qaa.algorithm.QaaAlgorithm;
 import org.esa.beam.meris.qaa.algorithm.QaaConfig;
 import org.esa.beam.meris.qaa.algorithm.QaaConstants;
 import org.esa.beam.meris.qaa.algorithm.QaaResult;
-import org.esa.beam.meris.qaa.algorithm.WaterClarity;
+import org.esa.beam.util.ArrayUtils;
+import org.esa.beam.util.StringUtils;
+import org.esa.beam.util.logging.BeamLogManager;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @OperatorMetadata(alias = "Meris.QaaIOP",
                   description = "Performs retrieval of inherent optical properties (IOPs) for " +
                                 "coastal and open ocean waters for MERIS.",
-                  authors = " Zhongping Lee (University of Massachusetts Boston), Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
-                  copyright = "(C) 2014 by NRL and WSU",
-                  version = "1.4")
+                  authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
+                  copyright = "(C) 2013 by NRL and WSU",
+                  version = "1.3.2")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
@@ -46,8 +53,6 @@ public class QaaOp extends PixelOperator {
     private static final String A_YS_PATTERN = "a_ys_%d";
     private static final String FLAG_CODING = "analytical_flags";
     private static final String ANALYSIS_FLAG_BAND_NAME = FLAG_CODING;
-    private static final int FLAG_INDEX = 1;
-    private static final int[] WC_INDEXES = {0}; //y.jiang  water clarity
 
 
     @SourceProduct(alias = "source", label = "Source", description = "The source product containing reflectances.",
@@ -66,9 +71,14 @@ public class QaaOp extends PixelOperator {
                description = "Expression defining pixels considered for processing.")
     private String validPixelExpression;
 
+    @Deprecated
+    @Parameter(description = "Deprecated parameter. Use 'validPixelExpression' instead.")
+    String invalidPixelExpression;
+
     @Parameter(defaultValue = "0.001", label = "'A_TOTAL' lower bound",
                description = "The lower bound of the valid value range.")
     private float aTotalLower;
+
     @Parameter(defaultValue = "5.0", label = "'A_TOTAL' upper bound",
                description = "The upper bound of the valid value range.")
     private float aTotalUpper;
@@ -76,6 +86,7 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "0.0001", label = "'BB_SPM' lower bound",
                description = "The lower bound of the valid value range.")
     private float bbSpmLower;
+
     @Parameter(defaultValue = "1.0", label = "'BB_SPM' upper bound",
                description = "The upper bound of the valid value range.")
     private float bbSpmUpper;
@@ -83,6 +94,7 @@ public class QaaOp extends PixelOperator {
     @Parameter(defaultValue = "0.0001", label = "'A_PIG' lower bound",
                description = "The lower bound of the valid value range.")
     private float aPigLower;
+
     @Parameter(defaultValue = "3.0", label = "'A_PIG' upper bound",
                description = "The upper bound of the valid value range.")
     private float aPigUpper;
@@ -99,39 +111,9 @@ public class QaaOp extends PixelOperator {
                description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
-
-    /*
-    *   The next two parameters are for water clarity. The runWC is an important part
-    *   due to it being used throughout the entire program to only run the selected plugin.
-    *
-    *
-    *   n.guggenberger Mar-26-14
-    */
-    @Parameter(defaultValue = "false", label = "Derive Water Clarity",
-               description = "Choose whether to derive Water Clarity in addition to QAA.")
-    private boolean runWC;
-
-    @Parameter(defaultValue = "WATER_CLARITY_1", label = "Water Clarity", unit = "%",
-               description = "Water Clarity 1%, 10%, 50%.")
-    private WaterClarity waterClarity;
-
-
     private VirtualBandOpImage validOpImage;
     private QaaAlgorithm qaaAlgorithm;
     private ThreadLocal<QaaResult> qaaResult;
-    private Qaa qaa;
-
-
-    /*
-    *   Getters and Setters for the runWC variable. Allowing access to variable when instantiated.
-    */
-    public boolean getRunWC() {
-        return this.runWC;
-    }
-
-    public void setRunWC(boolean runStatus) {
-        runWC = runStatus;
-    }
 
     @Override
     protected void prepareInputs() throws OperatorException {
@@ -143,7 +125,6 @@ public class QaaOp extends PixelOperator {
 
         qaaAlgorithm = new QaaAlgorithm();
         qaaAlgorithm.setConfig(createConfiguredConfig());
-        qaa = new Qaa(QaaConstants.NO_DATA_VALUE);
 
         qaaResult = new ThreadLocal<QaaResult>() {
             @Override
@@ -170,35 +151,23 @@ public class QaaOp extends PixelOperator {
     @Override
     protected void configureTargetProduct(ProductConfigurer configurer) {
         super.configureTargetProduct(configurer);
-
-        //  First of many uses of the if(runWC) or if (!runWC) to determine if that segment needs
-        //  to be ran or not.       n.guggenberger Mar-26-14
-        if (!runWC) {
-            for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
-                addBand(configurer, A_TOTAL_PATTERN, QaaConstants.WAVELENGTH[i],
-                        "Total absorption coefficient of all water constituents at %d nm.");
-            }
-            for (int i = 0; i < QaaConstants.BB_SPM_BAND_INDEXES.length; i++) {
-                addBand(configurer, BB_SPM_PATTERN, QaaConstants.WAVELENGTH[i],
-                        "Backscattering of suspended particulate matter at %d nm.");
-            }
-
-            for (int i = 0; i < QaaConstants.A_PIG_BAND_INDEXES.length; i++) {
-                addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i],
-                        "Pigment absorption coefficient at %d nm.");
-            }
-
-            for (int i = 0; i < QaaConstants.A_YS_BAND_INDEXES.length; i++) {
-                addBand(configurer, A_YS_PATTERN, QaaConstants.WAVELENGTH[i],
-                        "Yellow substance absorption coefficient at %d nm.");
-            }
+        for (int i = 0; i < QaaConstants.A_TOTAL_BAND_INDEXES.length; i++) {
+            addBand(configurer, A_TOTAL_PATTERN, QaaConstants.WAVELENGTH[i],
+                    "Total absorption coefficient of all water constituents at %d nm.");
+        }
+        for (int i = 0; i < QaaConstants.BB_SPM_BAND_INDEXES.length; i++) {
+            addBand(configurer, BB_SPM_PATTERN, QaaConstants.WAVELENGTH[i],
+                    "Backscattering of suspended particulate matter at %d nm.");
         }
 
+        for (int i = 0; i < QaaConstants.A_PIG_BAND_INDEXES.length; i++) {
+            addBand(configurer, A_PIG_PATTERN, QaaConstants.WAVELENGTH[i],
+                    "Pigment absorption coefficient at %d nm.");
+        }
 
-        if (runWC) {
-            String bandnameEZ = "Water Clarity_" + waterClarity + "%%";
-            String discriptionEZ = bandnameEZ;
-            addBand(configurer, bandnameEZ, 490, discriptionEZ); //y.jiang
+        for (int i = 0; i < QaaConstants.A_YS_BAND_INDEXES.length; i++) {
+            addBand(configurer, A_YS_PATTERN, QaaConstants.WAVELENGTH[i],
+                    "Yellow substance absorption coefficient at %d nm.");
         }
 
         Product targetProduct = configurer.getTargetProduct();
@@ -246,9 +215,6 @@ public class QaaOp extends PixelOperator {
         for (int i = 0; i < 7; i++) {
             sampleConfigurer.defineSample(i, EnvisatConstants.MERIS_L2_BAND_NAMES[i]);
         }
-        if (runWC) {
-            sampleConfigurer.defineSample(7, EnvisatConstants.MERIS_SUN_ZENITH_DS_NAME); //changed April-23-2014 N. Guggenberger
-        }
     }
 
     @Override
@@ -267,85 +233,16 @@ public class QaaOp extends PixelOperator {
         QaaResult result = qaaResult.get();
 
         if (isSampleValid(x, y)) { // Check if it is water
-            final float[] rrs;
-            if (!runWC) {
-                rrs = new float[sourceSamples.length];  //y. jiang
-            } else {
-                rrs = new float[sourceSamples.length - 1];  //y. jiang
-            }
+            final float[] rrs = new float[sourceSamples.length];
             for (int i = 0; i < rrs.length; i++) {
                 rrs[i] = sourceSamples[i].getFloat();
-                if (runWC) {
-                    if (divideByPI) {    //Take care of Pi
-                        rrs[i] /= Math.PI;
-                    }
-                }
             }
-            if (!runWC) {
-                result = qaaAlgorithm.process(rrs, result);
-            }
-            if (runWC) {
-                try {
-                    float[] rrs_pixel = new float[7];
-                    float[] a_pixel = new float[6];
-                    float[] bbp_pixel = new float[6];
-                    float[] aph_pixel = new float[6];
-                    float[] adg_pixel = new float[6];
-
-                    /**
-                     * QAA v5 processing
-                     */
-                    // steps 0-6
-                    // The length of pixel is 7 bands, rrs_pixel... are 6 bands
-                    qaa.qaaf_v5(rrs, rrs_pixel, a_pixel, bbp_pixel);
-                    // steps 7-10
-                    qaa.qaaf_decomp(rrs_pixel, a_pixel, aph_pixel, adg_pixel);
-
-                    // fill target samples
-                    targetSamples[FLAG_INDEX].set((int) QaaConstants.FLAG_MASK_VALID);
-
-                    int IDX_490 = 2;
-                    float a = 0;
-                    a = 0;
-                    a = (float) Qaa.AW_COEFS[IDX_490] + aph_pixel[IDX_490] + adg_pixel[IDX_490];
-                    a = checkAgainstBounds(a, aTotalLower, aTotalUpper);
-                    // targetSamples[A_INDEXES[i]].set(a);
-
-                    float bb = 0;
-                    bb = (float) Qaa.BBW_COEFS[IDX_490] + bbp_pixel[IDX_490];
-                    bb = checkAgainstBounds(bb, bbSpmLower, bbSpmUpper);
-
-
-                    float z = qaa.qaaf_zeu(a, bb, sourceSamples[7].getFloat(), waterClarity); //remove x,y from params
-                    for (int i = 0; i < WC_INDEXES.length; i++) {
-                        if (z > 0) {
-                            targetSamples[WC_INDEXES[0]].set(z);       //y.jiang
-                        } else {
-                            throw new NegativeNumberException("Will produce an negative number", z);
-                        }
-                    }
-
-
-                } catch (NegativeNumberException ignored) {
-                    handleInvalid(targetSamples, QaaConstants.FLAG_MASK_INVALID);
-                    // targetSamples[WC_INDEXES[0]].set(sourceSamples[2].getFloat());
-                } catch (ImaginaryNumberException ignored) {
-                    handleInvalid(targetSamples, QaaConstants.FLAG_MASK_IMAGINARY);
-                    // targetSamples[WC_INDEXES[0]].set(sourceSamples[2].getFloat());
-                }
-            }
+            result = qaaAlgorithm.process(rrs, result);
         } else {
-            if (runWC) {
-                handleInvalid(targetSamples, QaaConstants.FLAG_MASK_INVALID);
-//           targetSamples[WC_INDEXES[0]].set(sourceSamples[2].getFloat());
-            } else {
-                result.invalidate();
-            }
+            result.invalidate();
         }
 
-        if (!runWC) {
-            writeResult(targetSamples, result);
-        }
+        writeResult(targetSamples, result);
     }
 
     static void writeResult(WritableSample[] targetSamples, QaaResult qaaResult) {
@@ -382,6 +279,12 @@ public class QaaOp extends PixelOperator {
     }
 
     private void validateParameters() {
+        if (StringUtils.isNotNullAndNotEmpty(invalidPixelExpression)) {
+            validPixelExpression = "not (" + invalidPixelExpression + ")";
+            final String message = String.format("The parameter 'invalidPixelExpression' is deprecated. Please use 'validPixelExpression' instead. " +
+                                                 "The expression is converted to '%s'", validPixelExpression);
+            getLogger().warning(message);
+        }
         if (!sourceProduct.isCompatibleBandArithmeticExpression(validPixelExpression)) {
             String message = String.format("The given expression '%s' is not compatible with the source product.",
                                            validPixelExpression);
@@ -391,20 +294,6 @@ public class QaaOp extends PixelOperator {
 
     private boolean isSampleValid(int x, int y) {
         return validOpImage.getData(new Rectangle(x, y, 1, 1)).getSample(x, y, 0) != 0;
-    }
-
-    private float checkAgainstBounds(float value, float lowerBound, float upperBound) {
-        if (value < lowerBound || value > upperBound) {
-            value = QaaConstants.NO_DATA_VALUE;
-        }
-        return value;
-    }
-
-    private void handleInvalid(WritableSample[] targetSamples, int flagIndex) {
-        targetSamples[FLAG_INDEX].set(flagIndex);
-        for (int i = 0; i < targetSamples.length - 1; i++) {
-            targetSamples[i].set(QaaConstants.NO_DATA_VALUE);
-        }
     }
 
     private void addFlagAndMask(Product targetProduct, FlagCoding flagCoding, String flagName, String flagDescription,
@@ -430,9 +319,88 @@ public class QaaOp extends PixelOperator {
 
     public static class Spi extends OperatorSpi {
 
-        public Spi() {
-            super(QaaOp.class);
+        private static final Map<String[], String> DEPRECATED_PARAMETERS = new HashMap<String[], String>();
+
+        static {
+            DEPRECATED_PARAMETERS.put(new String[]{"a_lower", "aLowerBound"}, "aTotalLower");
+            DEPRECATED_PARAMETERS.put(new String[]{"a_upper", "aUpperBound"}, "aTotalUpper");
+            DEPRECATED_PARAMETERS.put(new String[]{"bb_lower", "bbLowerBound"}, "bbSpmLower");
+            DEPRECATED_PARAMETERS.put(new String[]{"bb_upper", "bbUpperBound"}, "bbSpmUpper");
+            DEPRECATED_PARAMETERS.put(new String[]{"aph_lower", "aphLowerBound"}, "aPigLower");
+            DEPRECATED_PARAMETERS.put(new String[]{"aph_upper", "aphUpperBound"}, "aPigUpper");
+            DEPRECATED_PARAMETERS.put(new String[]{"adg_upper", "adgUpperBound"}, "aYsUpper");
         }
 
+        private Logger logger;
+
+        public Spi() {
+            super(QaaOp.class);
+            logger = BeamLogManager.getSystemLogger();
+        }
+
+        @Override
+        public Operator createOperator(Map<String, Object> parameters, Map<String, Product> sourceProducts) throws
+                                                                                                            OperatorException {
+            if (isDeprecatedParameterUsed(parameters)) {
+                logWarning();
+                mapParameterValuesToNewParameter(parameters);
+            }
+            return super.createOperator(parameters, sourceProducts);
+        }
+
+        private boolean isDeprecatedParameterUsed(Map<String, Object> parameters) {
+            Set<String[]> deprecatedParamSet = DEPRECATED_PARAMETERS.keySet();
+            for (String[] deprecatedParameterNames : deprecatedParamSet) {
+                for (String deprecatedParameterName : deprecatedParameterNames) {
+                    if (parameters.containsKey(deprecatedParameterName)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void mapParameterValuesToNewParameter(Map<String, Object> parameters) {
+            Map<String, Object> parameterCopy = new HashMap<String, Object>(parameters);
+            Map<String, Object> parameterIterator = new HashMap<String, Object>(parameters);
+            Set<Map.Entry<String[], String>> deprecatedParameterEntrySet = DEPRECATED_PARAMETERS.entrySet();
+            for (Map.Entry<String, Object> usedParameter : parameterCopy.entrySet()) {
+                String usedParameterName = usedParameter.getKey();
+                Object usedParameterValue = usedParameter.getValue();
+                for (Map.Entry<String[], String> deprecatedParameterEntry : deprecatedParameterEntrySet) {
+                    String[] deprecatedParameterNames = deprecatedParameterEntry.getKey();
+                    if (ArrayUtils.isMemberOf(usedParameterName, deprecatedParameterNames)) {
+                        mapParameterValue(parameters, usedParameterName, usedParameterValue, deprecatedParameterEntry);
+                    }
+                }
+            }
+        }
+
+        private void mapParameterValue(Map<String, Object> parameters, String usedParameterName,
+                                       Object usedParameterValue,
+                                       Map.Entry<String[], String> deprecatedParameterEntry) {
+            parameters.remove(usedParameterName);
+            String newParameterName = deprecatedParameterEntry.getValue();
+            parameters.put(newParameterName, usedParameterValue);
+            logger.log(Level.INFO, String.format("Mapping value [%s] from '%s' to '%s'",
+                                                 usedParameterValue, usedParameterName,
+                                                 newParameterName));
+        }
+
+        private void logWarning() {
+            Set<String[]> deprecatedParamSet = DEPRECATED_PARAMETERS.keySet();
+            StringBuilder sb = new StringBuilder();
+            for (String[] names : deprecatedParamSet) {
+                sb.append(StringUtils.arrayToString(names, ", "));
+                sb.append("\n");
+            }
+            String deprecatedParamsList = sb.toString();
+            logger.log(Level.WARNING, "Deprecated parameter names are used.\n" +
+                                      "Deprecated names are:\n" +
+                                      deprecatedParamsList +
+                                      "The given parameter values are mapped to the new parameters.\n" +
+                                      "Please update your parameter configuration."
+            );
+        }
     }
 }

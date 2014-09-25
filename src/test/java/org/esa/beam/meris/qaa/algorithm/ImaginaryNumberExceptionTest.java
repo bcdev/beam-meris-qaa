@@ -1,7 +1,6 @@
 package org.esa.beam.meris.qaa.algorithm;
 
 
-import org.esa.beam.meris.qaa.ImaginaryNumberException;
 import org.junit.Test;
 
 import static junit.framework.Assert.*;

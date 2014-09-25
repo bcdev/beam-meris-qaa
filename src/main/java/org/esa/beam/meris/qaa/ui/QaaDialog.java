@@ -1,10 +1,10 @@
 package org.esa.beam.meris.qaa.ui;
 
+import com.bc.ceres.binding.Property;
 import com.bc.ceres.binding.PropertySet;
 import org.esa.beam.framework.datamodel.Product;
 import org.esa.beam.framework.gpf.GPF;
 import org.esa.beam.framework.gpf.OperatorSpi;
-import org.esa.beam.framework.gpf.descriptor.OperatorDescriptor;
 import org.esa.beam.framework.gpf.ui.OperatorMenu;
 import org.esa.beam.framework.gpf.ui.OperatorParameterSupport;
 import org.esa.beam.framework.gpf.ui.SingleTargetProductDialog;
@@ -28,15 +28,18 @@ class QaaDialog extends SingleTargetProductDialog {
         super(appContext, title, helpId);
         this.opAlias = opAlias;
         final OperatorSpi operatorSpi = GPF.getDefaultInstance().getOperatorSpiRegistry().getOperatorSpi(opAlias);
-        OperatorDescriptor operatorDescriptor = operatorSpi.getOperatorDescriptor();
 
-        parameterSupport = new OperatorParameterSupport(operatorDescriptor);
-        final PropertySet propertySet = parameterSupport.getPropertySet();
+        parameterSupport = new OperatorParameterSupport(operatorSpi.getOperatorClass());
+        parameterSupport.getParameterMap().remove("invalidPixelExpression");
+        final PropertySet propertySet = parameterSupport.getPopertySet();
+        final Property invalidPixelExpressionProperty = propertySet.getProperty("invalidPixelExpression");
+        if (invalidPixelExpressionProperty != null) {
+            propertySet.removeProperty(invalidPixelExpressionProperty);
+        }
         form = new QaaForm(appContext, operatorSpi, propertySet, getTargetProductSelector());
         OperatorMenu operatorMenu = new OperatorMenu(this.getJDialog(),
-                                                     operatorDescriptor,
+                                                     operatorSpi.getOperatorClass(),
                                                      parameterSupport,
-                                                     appContext,
                                                      helpId);
         getJDialog().setJMenuBar(operatorMenu.createDefaultMenu());
     }

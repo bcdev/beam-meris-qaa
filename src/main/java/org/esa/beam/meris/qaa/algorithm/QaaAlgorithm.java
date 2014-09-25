@@ -1,7 +1,5 @@
 package org.esa.beam.meris.qaa.algorithm;
 
-import org.esa.beam.meris.qaa.ImaginaryNumberException;
-
 public class QaaAlgorithm {
 
     private static final double ONE_DIV_PI = 1.0 / Math.PI;
@@ -33,7 +31,6 @@ public class QaaAlgorithm {
      *               rrs_in[4] @ 560   nm
      *               rrs_in[5] @ 620   nm
      *               rrs_in[6] @ 665   nm
-     *
      * @return the computation result
      */
     public QaaResult process(float[] rrs_in, QaaResult recycle) {

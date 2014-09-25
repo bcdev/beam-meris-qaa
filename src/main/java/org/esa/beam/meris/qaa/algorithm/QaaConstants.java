@@ -10,7 +10,7 @@ public final class QaaConstants {
     public static final int[] A_PIG_BAND_INDEXES = {10, 11, 12};
     public static final int[] A_YS_BAND_INDEXES = {13, 14, 15};
 
-    public static final int[] WAVELENGTH = {412, 443, 490, 510, 560, 620, 670};
+    public static final int[] WAVELENGTH = {412, 443, 490, 510, 560, 620};
 
     public static final int FLAG_MASK_VALID = 0x0001;
     public static final int FLAG_MASK_IMAGINARY = 0x0002;
