@@ -37,11 +37,11 @@ import java.util.logging.Logger;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @OperatorMetadata(alias = "Meris.QaaIOP",
-                  description = "Performs retrieval of inherent optical properties (IOPs) for " +
-                                "coastal and open ocean waters for MERIS.",
-                  authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
-                  copyright = "(C) 2013 by NRL and WSU",
-                  version = "1.3.2")
+        description = "Performs retrieval of inherent optical properties (IOPs) for " +
+                "coastal and open ocean waters for MERIS.",
+        authors = " Zhongping Lee, Mingrui Zhang (WSU); Marco Peters (Brockmann Consult)",
+        copyright = "(C) 2013 by NRL and WSU",
+        version = "1.3.3")
 public class QaaOp extends PixelOperator {
 
     private static final String PRODUCT_TYPE = "QAA_L2";
@@ -56,19 +56,19 @@ public class QaaOp extends PixelOperator {
 
 
     @SourceProduct(alias = "source", label = "Source", description = "The source product containing reflectances.",
-                   bands = {
-                           EnvisatConstants.MERIS_L2_REFLEC_1_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_2_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_3_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_4_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
-                           EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
-                   })
+            bands = {
+                    EnvisatConstants.MERIS_L2_REFLEC_1_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_2_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_3_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_4_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_5_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_6_BAND_NAME,
+                    EnvisatConstants.MERIS_L2_REFLEC_7_BAND_NAME
+            })
     private Product sourceProduct;
 
     @Parameter(defaultValue = "l2_flags.WATER",
-               description = "Expression defining pixels considered for processing.")
+            description = "Expression defining pixels considered for processing.")
     private String validPixelExpression;
 
     @Deprecated
@@ -76,39 +76,39 @@ public class QaaOp extends PixelOperator {
     String invalidPixelExpression;
 
     @Parameter(defaultValue = "0.001", label = "'A_TOTAL' lower bound",
-               description = "The lower bound of the valid value range.")
+            description = "The lower bound of the valid value range.")
     private float aTotalLower;
 
     @Parameter(defaultValue = "5.0", label = "'A_TOTAL' upper bound",
-               description = "The upper bound of the valid value range.")
+            description = "The upper bound of the valid value range.")
     private float aTotalUpper;
 
     @Parameter(defaultValue = "0.0001", label = "'BB_SPM' lower bound",
-               description = "The lower bound of the valid value range.")
+            description = "The lower bound of the valid value range.")
     private float bbSpmLower;
 
     @Parameter(defaultValue = "1.0", label = "'BB_SPM' upper bound",
-               description = "The upper bound of the valid value range.")
+            description = "The upper bound of the valid value range.")
     private float bbSpmUpper;
 
     @Parameter(defaultValue = "0.0001", label = "'A_PIG' lower bound",
-               description = "The lower bound of the valid value range.")
+            description = "The lower bound of the valid value range.")
     private float aPigLower;
 
     @Parameter(defaultValue = "3.0", label = "'A_PIG' upper bound",
-               description = "The upper bound of the valid value range.")
+            description = "The upper bound of the valid value range.")
     private float aPigUpper;
 
     @Parameter(defaultValue = "0.0001", label = "'A_YS' upper bound",
-               description = "The lower bound of the valid value range.")
+            description = "The lower bound of the valid value range.")
     private float aYsLower;
 
     @Parameter(defaultValue = "1.0", label = "'A_YS' upper bound",
-               description = "The upper bound of the valid value range")
+            description = "The upper bound of the valid value range")
     private float aYsUpper;
 
     @Parameter(defaultValue = "true", label = "Divide source Rrs by PI(3.14)",
-               description = "If selected the source remote reflectances are divided by PI")
+            description = "If selected the source remote reflectances are divided by PI")
     private boolean divideByPI;
 
     private VirtualBandOpImage validOpImage;
@@ -281,8 +281,8 @@ public class QaaOp extends PixelOperator {
     private void validateParameters() {
         if (StringUtils.isNotNullAndNotEmpty(invalidPixelExpression)) {
             validPixelExpression = "not (" + invalidPixelExpression + ")";
-            final String message = String.format("The parameter 'invalidPixelExpression' is deprecated. Please use 'validPixelExpression' instead. " +
-                                                 "The expression is converted to '%s'", validPixelExpression);
+            final String message = String.format("The parameter 'invalidPixelExpression' of %s is deprecated. Please use 'validPixelExpression' instead. " +
+                                                         "The expression is converted to '%s'", getSpi().getOperatorAlias(), validPixelExpression);
             getLogger().warning(message);
         }
         if (!sourceProduct.isCompatibleBandArithmeticExpression(validPixelExpression)) {
@@ -340,7 +340,7 @@ public class QaaOp extends PixelOperator {
 
         @Override
         public Operator createOperator(Map<String, Object> parameters, Map<String, Product> sourceProducts) throws
-                                                                                                            OperatorException {
+                OperatorException {
             if (isDeprecatedParameterUsed(parameters)) {
                 logWarning();
                 mapParameterValuesToNewParameter(parameters);
@@ -395,11 +395,11 @@ public class QaaOp extends PixelOperator {
                 sb.append("\n");
             }
             String deprecatedParamsList = sb.toString();
-            logger.log(Level.WARNING, "Deprecated parameter names are used.\n" +
-                                      "Deprecated names are:\n" +
-                                      deprecatedParamsList +
-                                      "The given parameter values are mapped to the new parameters.\n" +
-                                      "Please update your parameter configuration."
+            logger.log(Level.WARNING, "Deprecated parameter names are used in " + getOperatorAlias() + ".\n" +
+                    "Deprecated names are:\n" +
+                    deprecatedParamsList +
+                    "The given parameter values are mapped to the new parameters.\n" +
+                    "Please update your parameter configuration."
             );
         }
     }
